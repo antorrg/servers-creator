@@ -8,7 +8,7 @@ export const nextMd = (options: ProjectConfig)=>{
     return `
 # Api \`${options.projectName}\` (${orm.part1} NEXT API)
 
-A scalable API starter kit generated with CreateBackend CLI. Build for NEXT apps.
+A scalable API starter kit generated with servers-creator CLI. Build for NEXT apps.
 
 ## Summary
 

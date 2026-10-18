@@ -27,6 +27,7 @@ async function startUp() {
   } catch (error) {
     console.error(errorMsg)
     logger.error(error)
+    throw error
   }
 }
 
@@ -35,6 +36,7 @@ async function closeDatabase() {
     await pool.end()
   } catch (error) {
     logger.error(error)
+     throw error
   }
 }
 

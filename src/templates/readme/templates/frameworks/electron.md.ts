@@ -8,7 +8,7 @@ export const electronMd = (options: ProjectConfig)=>{
     return `
 # Api \`${options.projectName}\` (${orm.part1} ELECTRON API)
 
-A scalable API starter kit generated with CreateBackend CLI. Build for electron apps.
+A scalable API starter kit generated with servers-creator CLI. Build for electron apps.
 
 ## Summary
 

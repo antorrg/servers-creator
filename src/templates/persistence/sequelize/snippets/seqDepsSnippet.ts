@@ -1,6 +1,5 @@
 export const seqDepSnippet = {
-  deps: `"@sequelize/core": "7.0.0-alpha.48",
-    "@sequelize/postgres": "7.0.0-alpha.48",
+  deps: `"sequelize": "^6.37.8",
     "pg": "^8.17.2",
     "pg-hstore": "^2.3.4",`,
   devDeps: `"@types/pg": "^8.23.1",`

@@ -11,7 +11,7 @@ export const authExpress:Auth = {
 Handle session validation, cookie parsing, and CSRF protection (csrfProtection, setCsrfToken, verifyCsrfToken).`,
         part4: `
 
-### Autentication (\`/api/v1/auth\`)
+### Authentication (\`/api/v1/auth\`)
 
 | Method | Endpoint | Description | Authentication | Required Payload / Query |
 | :--- | :--- | :--- | :--- | :--- |

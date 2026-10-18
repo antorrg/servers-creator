@@ -1,7 +1,7 @@
 export const loggerServiceDbSequelize ={
   importType:`'../../models/log.model.js'`,
   file:`import { throwError, processError, ERROR_CODE } from '../errors.js'
-import { Op } from '@sequelize/core'
+import { Op } from 'sequelize'
 import { LogLevel, Log } from '../../models/log.model.js'
 import { UuidHandler } from '../../shared/utils/UuidHandler.js'
 import {

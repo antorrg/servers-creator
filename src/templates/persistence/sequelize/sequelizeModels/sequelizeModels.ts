@@ -2,14 +2,13 @@
  
 export const userModel = {
         subPath:`user.model.ts`,
-        file: `import { 
-  Sequelize, 
-  Model, 
+        file: `import { Model, DataTypes } from 'sequelize'
+  import type { 
+  Sequelize,
   CreationOptional, 
-  DataTypes, 
   InferAttributes, 
   InferCreationAttributes 
-} from '@sequelize/core'
+} from 'sequelize'
 
 export class User extends Model<
 InferAttributes<User>, 
@@ -77,14 +76,13 @@ export default (sequelize: Sequelize) => {
     }
 export const logModel = {
         subPath:`log.model.ts`,
-        file: `import {
-  Sequelize, 
-  Model, 
-  CreationOptional, 
-  DataTypes, 
+        file: `import { Model, DataTypes } from 'sequelize'
+import type { 
+  Sequelize,
+  CreationOptional,
   InferAttributes, 
-  InferCreationAttributes
-} from '@sequelize/core'
+  InferCreationAttributes 
+} from 'sequelize'
 
 export enum LogLevel {
   DEBUG = 'DEBUG',
@@ -99,23 +97,17 @@ export class Log extends Model<
   InferCreationAttributes<Log>
 > {
   declare id: string
-
   declare levelName: LogLevel
   declare levelCode: number
   declare message: string
-
   declare type: string | null
   declare status: number | null
   declare stack: string | null
-
   declare contexts: CreationOptional<string[]>
-
   declare pid: CreationOptional<number>
   declare time: CreationOptional<number | null>
   declare hostname: string | null
-
   declare keep: CreationOptional<boolean>
-
   declare createdAt: CreationOptional<Date>
   declare updatedAt: CreationOptional<Date>
 }
@@ -127,7 +119,6 @@ export default (sequelize: Sequelize) => {
         type: DataTypes.UUID,
         primaryKey: true
       },
-
       levelName: {
         type: DataTypes.ENUM(
           LogLevel.DEBUG,
@@ -138,57 +129,55 @@ export default (sequelize: Sequelize) => {
         ),
         allowNull: false
       },
-
       levelCode: {
         type: DataTypes.INTEGER,
         allowNull: false
       },
-
       message: {
         type: DataTypes.TEXT,
         allowNull: false
       },
-
       type: {
         type: DataTypes.STRING,
         allowNull: true
       },
-
       status: {
         type: DataTypes.INTEGER,
         allowNull: true
       },
-
       stack: {
         type: DataTypes.TEXT,
         allowNull: true
       },
-
       contexts: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
         defaultValue: []
       },
-
       pid: {
         type: DataTypes.INTEGER,
         allowNull: false
       },
-
       time: {
         type: DataTypes.BIGINT,
         allowNull: true
       },
-
       hostname: {
         type: DataTypes.STRING,
         allowNull: true
       },
-
       keep: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false
       }
     },
     {
@@ -204,16 +193,14 @@ export default (sequelize: Sequelize) => {
  //* Optional models:
 export const sessionModel = {
       subPath: `session.model.ts`,
-      file:`import type {
-  Sequelize, 
-  CreationOptional, 
+      file:`import { Model, DataTypes } from 'sequelize'
+  import type { 
+  Sequelize,
+  CreationOptional,
   InferAttributes, 
-  InferCreationAttributes
-} from '@sequelize/core'
-import { 
-  Model, 
-  DataTypes
-} from '@sequelize/core'
+  InferCreationAttributes 
+} from 'sequelize'
+
 
 export class Session extends Model<
   InferAttributes<Session>,
@@ -259,12 +246,13 @@ export default initSessionModel
 `}
 export const refreshModel = {
   subPath: 'refreshToken.model.ts',
-  file: `import type {
+  file: `import { Model, DataTypes } from 'sequelize'
+  import type { 
   Sequelize,
-  InferAttributes,
-  InferCreationAttributes
-} from '@sequelize/core'
-import { Model, DataTypes } from '@sequelize/core'
+  CreationOptional,
+  InferAttributes, 
+  InferCreationAttributes 
+} from 'sequelize'
 
 export class RefreshToken extends Model<
   InferAttributes<RefreshToken>,

@@ -1,7 +1,7 @@
 
 
 export const seqSessionAuthSnippetExpress = {
-    file: `import { type ModelStatic, type Model, Op } from '@sequelize/core'
+    file: `import { type ModelStatic, type Model, Op } from 'sequelize'
 import { Session } from '../../../configs/database.js'
 import type { ISessionAdapter, DefaultFields } from './types.js'
 

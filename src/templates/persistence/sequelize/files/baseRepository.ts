@@ -5,7 +5,7 @@
  */
 
 export const baseRepository = `import type { IBaseRepository, IPaginatedOptions, IPaginatedResults } from '../interfaces/base.interface.js'
-import { Model, ModelStatic } from '@sequelize/core'
+import { Model, ModelStatic } from 'sequelize'
 import { throwError, ERROR_CODE } from '../../configs/errors.js'
 
 export class BaseRepository<

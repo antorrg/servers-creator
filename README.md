@@ -16,7 +16,7 @@ An interactive, zero-dependency native Node.js CLI tool to scaffold production-r
 - **Framework Options**: Modern **Express 5** and **Fastify 5** with full TypeScript setup out of the box.
 - **ORM & Database Support**:
   - ✅ **Prisma v7** (PostgreSQL)
-  - ✅ **Sequelize v7** (PostgreSQL)
+  - ✅ **Sequelize v6** (PostgreSQL)
   - ✅ **Drizzle-Orm V0.45.3** (PostgreSQL)
   - ✅ **Standalone / No DB**
   - 🔄 **Mongoose** *(Roadmap)*
@@ -113,7 +113,7 @@ To contribute to `servers-creator` or test changes locally:
    ```bash
 
    git clone https://github.com/antorrg/servers-creator.git
-   cd create-backend
+   cd servers-creator
    ```
 
 2. **Install dependencies**:

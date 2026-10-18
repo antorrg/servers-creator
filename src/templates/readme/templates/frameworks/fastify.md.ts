@@ -17,11 +17,67 @@ const fastifyMdDb = (options: ProjectConfig)=>{
     return `
 # Api \`${options.projectName}\` (${nameServer} ${orm.part1} REST API)
 
-A scalable, production-ready RESTful API starter kit generated with CreateBackend CLI. Built with Fastify 5, TypeScript, ${orm.part2}${auth.part1}.
+A scalable, production-ready RESTful API starter kit generated with servers-creator CLI. Built with Fastify 5, TypeScript, ${orm.part2}${auth.part1}.
 
 ## Summary
 
 A scalable and modern REST API boilerplate built with ${nameServer}, TypeScript and ${orm.part2}. Designed to kickstart backend services with clean project structure, environment configuration, and standard error handling out of the box.
+
+### How to Proceed (Getting Started)
+
+Follow these steps to set up and run your project locally.
+
+1. **Prerequisites**
+
+Ensure you have installed:
+
+Node.js: v20 or higher
+Package Manager: npm, pnpm, or yarn
+PostgreSQL Database: Running locally or via Docker
+
+2. **Install Dependencies**
+npm install
+
+### 3. Environment Setup
+Create your local environment configuration file from the template:
+\`\`\`bash
+cp .env.example .env.development
+\`\`\`
+#### Environment Variables Reference
+| Variable | Description | Default / Example | Required |
+| :--- | :--- | :--- | :--- |
+| \`PORT\` | Server listening port | \`3000\` | No |
+| \`DATABASE_URL\` | PostgreSQL connection string | \`postgres://user:pass@localhost:5432/db\` | Yes |
+| \`SESSION_SECRET\` | Secret key used for session cookie encryption | \`super_secret_key\` | Yes |
+
+#### Configure your database connection parameters inside .env.development:
+
+\`\`\`bash
+
+PORT=3000
+DATABASE_URL=postgres://user:password@localhost:5432/dbName
+SESSION_SECRET=super_secret_session_key
+
+\`\`\`
+
+4. **Database Setup**
+
+Ensure PostgreSQL is running and the database specified in DATABASE_URL exists.
+
+${orm.part6}
+
+
+## Available Scripts
+
+| Script | Command | Description |
+| :--- | :--- | :--- |
+| **Development** | \`npm run dev\` | Starts server in dev mode with live reload (\`tsx watch\`) |
+| **Testing** | \`npm run test\` | Runs unit & integration tests via Vitest |
+| **Build** | \`npm run build\` | Compiles TypeScript into \`/dist\` directory |
+| **Production** | \`npm run start\` | Runs compiled JavaScript from \`/dist\` |
+| **Linting** | \`npm run lint\` | Lints TypeScript files using ESLint |
+
+---
 
 ### Architecture Overview
 
@@ -92,62 +148,6 @@ ${options.projectName}/
 
 \`\`\`
 
-
-### How to Proceed (Getting Started)
-
-Follow these steps to set up and run your project locally.
-
-1. **Prerequisites**
-
-Ensure you have installed:
-
-Node.js: v20 or higher
-Package Manager: npm, pnpm, or yarn
-PostgreSQL Database: Running locally or via Docker
-
-2. **Install Dependencies**
-npm install
-
-### 3. Environment Setup
-Create your local environment configuration file from the template:
-\`\`\`bash
-cp .env.example .env.development
-\`\`\`
-#### Environment Variables Reference
-| Variable | Description | Default / Example | Required |
-| :--- | :--- | :--- | :--- |
-| \`PORT\` | Server listening port | \`3000\` | No |
-| \`DATABASE_URL\` | PostgreSQL connection string | \`postgres://user:pass@localhost:5432/db\` | Yes |
-| \`SESSION_SECRET\` | Secret key used for session cookie encryption | \`super_secret_key\` | Yes |
-
-#### Configure your database connection parameters inside .env.development:
-
-\`\`\`bash
-
-PORT=3000
-DATABASE_URL=postgres://user:password@localhost:5432/dbName
-SESSION_SECRET=super_secret_session_key
-
-\`\`\`
-
-4. **Database Setup**
-
-Ensure PostgreSQL is running and the database specified in DATABASE_URL exists.
-
-${orm.part6}
-
-
-## Available Scripts
-
-| Script | Command | Description |
-| :--- | :--- | :--- |
-| **Development** | \`npm run dev\` | Starts server in dev mode with live reload (\`tsx watch\`) |
-| **Testing** | \`npm run test\` | Runs unit & integration tests via Vitest |
-| **Build** | \`npm run build\` | Compiles TypeScript into \`/dist\` directory |
-| **Production** | \`npm run start\` | Runs compiled JavaScript from \`/dist\` |
-| **Linting** | \`npm run lint\` | Lints TypeScript files using ESLint |
-
----
 
 ## Main API Endpoints
 
