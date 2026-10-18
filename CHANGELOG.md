@@ -7,13 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.1-alfa.0]
+## [0.0.1]
 
 ### Add
 
 - Functionality was added for drizzle-orm
 
 - Server functionalities were downloaded and tested.
+
+- Fix errors in imports and names
 
 ## [0.0.1-beta.2]
 
