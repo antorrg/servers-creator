@@ -3,7 +3,7 @@ export const pkgJsonSnippet = {
     "@prisma/client": "^7.10.0",
     "pg": "^8.23.0",`,
   devDeps: `"@types/pg": "^8.23.1",
-    "prisma": "8.0.0-rc.12",`
+    "prisma": "^7.10.1",`
 }
 /**
  * // conditional use for auth with whitelist

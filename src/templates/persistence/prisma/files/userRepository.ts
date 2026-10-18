@@ -3,7 +3,7 @@ export const userRepository = `import { prisma } from '../../configs/database.js
 import type { IUserRepository, IUser } from './User.interfaces.js'
 import { BaseRepository } from '../../shared/repositories/BaseRepository.js'
 import { User, type UserProps } from './User.js'
-import type { UserModel } from '../../../generated/prisma/models/User.js'
+import type { UserModel } from '../../generated/prisma/models/User.js'
 import { processError, throwError, ERROR_CODE } from '../../configs/errors.js'
 
 const userModel = prisma.user

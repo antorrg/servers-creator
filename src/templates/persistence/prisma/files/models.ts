@@ -8,7 +8,7 @@ export const prismaModelPart = `// This is your Prisma schema file,
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -49,7 +49,7 @@ model Log {
   message   String
   type      String
   stack     String?
-  context   String[]
+  contexts  String[]
   pid       Int
   time      BigInt
   hostname  String

@@ -4,7 +4,7 @@ export const loggerServiceDbDrizzle ={
 import { eq, ilike, desc, asc, count } from 'drizzle-orm'
 import { type ILogger, type LoggerUpdate, type LoggerCreate, type ILoggerService, type IPagesOptions, type IActionResponse, type IPaginatedResponse } from './Logger.interfaces.js'
 import { db } from '../database.js'
-import { log } from '../../schemas/index.schemas.js'
+import { log, LogLevel } from '../../schemas/index.schemas.js'
 
 
 class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
@@ -22,7 +22,7 @@ class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
       message: u.message, 
       type: u.type ?? null,
       stack: u.stack ?? null, 
-      contexts: u.context ?? [],
+      contexts: u.contexts ?? [],
       pid: u.pid,
       time: Number(u.time),
       hostname: u.hostname,

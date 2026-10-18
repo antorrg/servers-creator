@@ -227,7 +227,7 @@ describe('BaseRepository unit test', () => {
   })
 })`
 
-export const baseRepositoryTestHelp = `import type { UserModel } from '../../../../generated/prisma/models/User.js'
+export const baseRepositoryTestHelp = `import type { UserModel } from '../../../generated/prisma/models/User.js'
 import { UuidHandler } from '../../utils/UuidHandler.js'
 
 export interface IUserTest {

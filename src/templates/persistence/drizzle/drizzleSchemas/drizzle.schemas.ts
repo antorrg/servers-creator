@@ -42,7 +42,7 @@ export const log = pgTable('log', {
   type: varchar('type', { length: 80 }),
   status: bigint('status', { mode: 'number' }),
   stack: text('stack'),
-  context: text('context').array(),
+  contexts: text('contexts').array(),
   pid: bigint('pid', { mode: 'number' }),
   time: bigint('time', { mode: 'number' }),
   hostname: varchar('hostname', { length: 120 }),

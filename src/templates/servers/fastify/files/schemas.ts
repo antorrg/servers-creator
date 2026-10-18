@@ -50,7 +50,7 @@ export const updateProfile = {
     nickname: { type: 'string' },
     picture: { type: 'string' }
   },
-  required: [],
+  required: ['email', 'name', 'nickname', 'picture'],
   additionalProperties: false
 } as const
 
@@ -80,12 +80,12 @@ export type CreateUser = {
   password: string
 }
 
-export type UpdateProfile = Partial<{
+export type UpdateProfile = {
   email: string
   name: string
   nickname: string
   picture: string
-}>
+}
 
 export type ChangePassword = {
   id: string

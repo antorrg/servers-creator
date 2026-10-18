@@ -32,6 +32,7 @@ function getNameDb(dbUri:string):string {
 async function startUp (syncDb: boolean = false, rewrite: boolean = false) {
   try {
     await sequelize.authenticate()
+    //eslint-disable-next-line
     const successMessage =\`🟢​ Database postgreSQL "\${getNameDb(envConfig.DatabaseUrl)}" initialized successfully!!\`
     console.log(successMessage)
     if (envConfig.Status !== 'production' && syncDb) {

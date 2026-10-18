@@ -2,16 +2,16 @@
 export const database = `import envConfig from './envConfig.js'
 import logger from './logger.js'
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../generated/prisma/client.js"
+import { PrismaClient } from "../generated/prisma/client.js"
 import { execSync } from 'child_process'
 
-const connectionString = \`\${envConfig.DatabaseUrl}\`;
+const connectionString = \`\${envConfig.DatabaseUrl}\`
 
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+const adapter = new PrismaPg({ connectionString })
+const prisma = new PrismaClient({ adapter })
 
 function getNameDb(dbUri:string):string {
- return dbUri.split('/').slice(-1).join()
+  return dbUri.split('/').slice(-1).join()
 }
 
 const startUp = async (reset = false) => {
@@ -46,7 +46,7 @@ const closeDatabase = async () => {
 }
 
 export {
-    prisma,
-    startUp,
-    closeDatabase
+  prisma,
+  startUp,
+  closeDatabase
 }`

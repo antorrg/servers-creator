@@ -1,11 +1,11 @@
 
 
 export const loggerServiceDbPrisma ={
-  importType: `'../../../generated/prisma/enums.js'`,
+  importType: `'../../generated/prisma/enums.js'`,
   file:`import { throwError, processError, ERROR_CODE } from '../errors.js'
 import { prisma } from '../database.js'
-import { LogLevel } from '../../../generated/prisma/enums.js'
-import type { Prisma, Log, PrismaClient } from '../../../generated/prisma/client.js'
+import { LogLevel } from '../../generated/prisma/enums.js'
+import type { Prisma, Log, PrismaClient } from '../../generated/prisma/client.js'
 import {
   type ILogger,
   type LoggerUpdate,
@@ -34,7 +34,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
       type: log.type ?? null,
       status: null,
       stack: log.stack ?? null,
-      contexts: log.context ?? [],
+      contexts: log.contexts ?? [],
       pid: log.pid,
       time: Number(log.time),
       hostname: log.hostname || '',
