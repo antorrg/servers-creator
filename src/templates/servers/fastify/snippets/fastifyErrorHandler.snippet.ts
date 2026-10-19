@@ -134,7 +134,7 @@ export const fastifyErrorHandlerTestSnippet = {
         expect(reply.status).toHaveBeenCalledWith(400)
         expect(reply.send).toHaveBeenCalledWith({
           ok: false,
-          code: 'UNEXPECTED_ERROR',
+          code: 'VALIDATION_ERROR',
           message: 'Invalid payload'
         })
       })

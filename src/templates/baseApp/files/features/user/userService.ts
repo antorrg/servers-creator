@@ -13,14 +13,14 @@ export class UserService {
 
   constructor(
     userRepository: UserRepository,
-    handleImageDelete: (url:string) => Promise<string | undefined>,
+    handleImageDelete: (url:string) => Promise<string | undefined>
   ) {
     this.userRepository = userRepository
     this.handleImageDelete= handleImageDelete
   }
   private mapToPublic(record:any):Omit<UserProps, 'password'> {
     return {
-     id: record.id,
+      id: record.id,
       email: record.email,
       role: record.role,
       name: record.name,
@@ -110,7 +110,7 @@ export class UserService {
      */
   async upgradeUser(userId: string, data:{role:string, enabled: boolean}): Promise<IUser> {
 
-        const allowedNewRole =  [ 'OWNER', 'ADMIN','USER']
+    const allowedNewRole =  ['OWNER', 'ADMIN','USER']
     if(!allowedNewRole.includes(data.role)){throwError(ERROR_CODE.ROLE_NOT_ALLOWED, 'Invalid role')}
 
     const user = await this.userRepository.getById(userId)
@@ -122,8 +122,8 @@ export class UserService {
 
     user!.changeUserScope(data.role, data.enabled)
 
-      const updatedUser = await this.userRepository.update(userId, user!)
-        return updatedUser
+    const updatedUser = await this.userRepository.update(userId, user!)
+    return updatedUser
 
   }
 
@@ -154,9 +154,11 @@ export class UserService {
     }
 
     const passwordMatch = await Hasher.compare(password, user.toPersistence().password)
-
-    if (!passwordMatch || user.toDTO().enabled === false) {
+    if (!passwordMatch) {
       throwError(ERROR_CODE.INVALID_CREDENTIALS, 'Invalid credentials')
+    }
+    if (user.toDTO().enabled === false) {
+      throwError(ERROR_CODE.ACCESS_BLOCKED, 'User blocked')
     }
 
     return user.toDTO()
@@ -170,7 +172,7 @@ export class UserService {
     return users.map(user => this.mapToPublic(user))
   }
   async getUserById(userId:string){
-   return await this.userRepository.getPublicById(userId)
+    return await this.userRepository.getPublicById(userId)
   
   }
   static #protectProtocol(role: string):void {
@@ -252,7 +254,7 @@ describe('UserService', () => {
   // ── registerUser ─────────────────────────────────────────────────────────────
 
   describe('registerUser', () => {
-    it('should hash the password, save the user, and return public DTO', async () => {
+    it('should hash the password, save the user, and return public DTO', async() => {
       vi.mocked(Hasher.hash).mockResolvedValue(VALID_HASH)
       mockRepo.save.mockResolvedValue(undefined)
 
@@ -270,7 +272,7 @@ describe('UserService', () => {
       expect(result).not.toHaveProperty('password')
     })
 
-    it('should throw an error if repository fails to save user', async () => {
+    it('should throw an error if repository fails to save user', async() => {
       vi.mocked(Hasher.hash).mockResolvedValue(VALID_HASH)
       mockRepo.save.mockRejectedValue(new Error('DB Save Failed'))
 
@@ -282,7 +284,7 @@ describe('UserService', () => {
   // ── updateProfile ────────────────────────────────────────────────────────────
 
   describe('updateProfile', () => {
-    it('should update user profile correctly', async () => {
+    it('should update user profile correctly', async() => {
       mockRepo.getById.mockResolvedValue(user)
       const updatedUserDto = {
         ...user.toDTO(),
@@ -306,7 +308,7 @@ describe('UserService', () => {
       expect(result.name).toBe('New Name')
     })
 
-    it('should execute handleImageDelete if profile picture URL changes', async () => {
+    it('should execute handleImageDelete if profile picture URL changes', async() => {
       mockRepo.getById.mockResolvedValue(user)
       mockRepo.update.mockResolvedValue({
         ...user.toDTO(),
@@ -325,7 +327,7 @@ describe('UserService', () => {
       expect(mockHandleImageDelete).toHaveBeenCalledWith('https://res.cloudinary.com/demo/image/upload/sample.jpg')
     })
 
-    it('should throw NOT_FOUND if user does not exist', async () => {
+    it('should throw NOT_FOUND if user does not exist', async() => {
       mockRepo.getById.mockResolvedValue(null)
 
       await expect(service.updateProfile('bad_id', {
@@ -336,7 +338,7 @@ describe('UserService', () => {
       })).rejects.toMatchObject({ code: ERROR_CODE.NOT_FOUND })
     })
 
-    it('should throw ACCESS_DENIED if target user has OWNER role (#protectProtocol)', async () => {
+    it('should throw ACCESS_DENIED if target user has OWNER role (#protectProtocol)', async() => {
       const ownerUser = makeUser({ role: 'OWNER' })
       mockRepo.getById.mockResolvedValue(ownerUser)
 
@@ -352,7 +354,7 @@ describe('UserService', () => {
   // ── changePassword ───────────────────────────────────────────────────────────
 
   describe('changePassword', () => {
-    it('should change password when current password is valid', async () => {
+    it('should change password when current password is valid', async() => {
       vi.mocked(Hasher.compare).mockResolvedValue(true)
       vi.mocked(Hasher.hash).mockResolvedValue('$2b$12$NEWHASHFORTESTING123456789')
       mockRepo.getById.mockResolvedValue(user)
@@ -370,7 +372,7 @@ describe('UserService', () => {
       expect(result).not.toHaveProperty('password')
     })
 
-    it('should throw NOT_FOUND if user does not exist', async () => {
+    it('should throw NOT_FOUND if user does not exist', async() => {
       mockRepo.getById.mockResolvedValue(null)
 
       await expect(service.changePassword({
@@ -380,7 +382,7 @@ describe('UserService', () => {
       })).rejects.toMatchObject({ code: ERROR_CODE.NOT_FOUND })
     })
 
-    it('should throw INVALID_INPUT if current password is incorrect', async () => {
+    it('should throw INVALID_INPUT if current password is incorrect', async() => {
       vi.mocked(Hasher.compare).mockResolvedValue(false)
       mockRepo.getById.mockResolvedValue(user)
 
@@ -391,7 +393,7 @@ describe('UserService', () => {
       })).rejects.toMatchObject({ code: ERROR_CODE.INVALID_INPUT })
     })
 
-    it('should throw ACCESS_DENIED if target user is OWNER (#protectProtocol)', async () => {
+    it('should throw ACCESS_DENIED if target user is OWNER (#protectProtocol)', async() => {
       const ownerUser = makeUser({ role: 'OWNER' })
       mockRepo.getById.mockResolvedValue(ownerUser)
 
@@ -406,7 +408,7 @@ describe('UserService', () => {
   // ── upgradeUser ──────────────────────────────────────────────────────────────
 
   describe('upgradeUser', () => {
-    it('should update user role and enabled status', async () => {
+    it('should update user role and enabled status', async() => {
       mockRepo.getById.mockResolvedValue(user)
       const updatedDto = { ...user.toDTO(), role: 'ADMIN', enabled: false }
       mockRepo.update.mockResolvedValue(updatedDto)
@@ -418,19 +420,19 @@ describe('UserService', () => {
       expect(result.enabled).toBe(false)
     })
 
-    it('should throw ROLE_NOT_ALLOWED if new role is invalid', async () => {
+    it('should throw ROLE_NOT_ALLOWED if new role is invalid', async() => {
       await expect(service.upgradeUser(user.toDTO().id, { role: 'SUPERUSER', enabled: true }))
         .rejects.toMatchObject({ code: ERROR_CODE.ROLE_NOT_ALLOWED })
     })
 
-    it('should throw NOT_FOUND if user does not exist', async () => {
+    it('should throw NOT_FOUND if user does not exist', async() => {
       mockRepo.getById.mockResolvedValue(null)
 
       await expect(service.upgradeUser('bad_id', { role: 'ADMIN', enabled: true }))
         .rejects.toMatchObject({ code: ERROR_CODE.NOT_FOUND })
     })
 
-    it('should throw ACCESS_DENIED if target user has OWNER role (#protectProtocol)', async () => {
+    it('should throw ACCESS_DENIED if target user has OWNER role (#protectProtocol)', async() => {
       const ownerUser = makeUser({ role: 'OWNER' })
       mockRepo.getById.mockResolvedValue(ownerUser)
 
@@ -442,7 +444,7 @@ describe('UserService', () => {
   // ── deleteUser ───────────────────────────────────────────────────────────────
 
   describe('deleteUser', () => {
-    it('should delete user and handle associated image deletion', async () => {
+    it('should delete user and handle associated image deletion', async() => {
       mockRepo.getById.mockResolvedValue(user)
       mockRepo.delete.mockResolvedValue(undefined)
       mockHandleImageDelete.mockResolvedValue(undefined)
@@ -454,14 +456,14 @@ describe('UserService', () => {
       expect(result).toBe('User with email: user@test.com deleted successfully')
     })
 
-    it('should throw NOT_FOUND if user does not exist', async () => {
+    it('should throw NOT_FOUND if user does not exist', async() => {
       mockRepo.getById.mockResolvedValue(null)
 
       await expect(service.deleteUser('bad_id'))
         .rejects.toMatchObject({ code: ERROR_CODE.NOT_FOUND })
     })
 
-    it('should throw ACCESS_DENIED when attempting to delete an OWNER user (#protectProtocol)', async () => {
+    it('should throw ACCESS_DENIED when attempting to delete an OWNER user (#protectProtocol)', async() => {
       const ownerUser = makeUser({ role: 'OWNER' })
       mockRepo.getById.mockResolvedValue(ownerUser)
 
@@ -473,7 +475,7 @@ describe('UserService', () => {
   // ── login ─────────────────────────────────────────────────────────────────────
 
   describe('login', () => {
-    it('should return user DTO when credentials are valid and user is enabled', async () => {
+    it('should return user DTO when credentials are valid and user is enabled', async() => {
       vi.mocked(Hasher.compare).mockResolvedValue(true)
       mockRepo.findByEmail.mockResolvedValue(user)
 
@@ -484,34 +486,33 @@ describe('UserService', () => {
       expect(result).not.toHaveProperty('password')
     })
 
-    it('should throw NOT_FOUND if email does not exist', async () => {
+    it('should throw INVALID_CREDENTIALS if email does not exist', async() => {
       mockRepo.findByEmail.mockResolvedValue(null)
 
       await expect(service.login('notfound@test.com', 'password'))
-        .rejects.toMatchObject({ code: ERROR_CODE.NOT_FOUND })
+        .rejects.toMatchObject({ code: ERROR_CODE.INVALID_CREDENTIALS })
     })
 
-    it('should throw ACCESS_DENIED with message "User blocked" if user is disabled', async () => {
+    it('should throw ACCESS_BLOCKED if user is disabled', async() => {
       const disabledUser = makeUser({ enabled: false })
       mockRepo.findByEmail.mockResolvedValue(disabledUser)
 
       await expect(service.login('user@test.com', 'password'))
-        .rejects.toMatchObject({ code: ERROR_CODE.ACCESS_DENIED, message: 'User blocked' })
+        .rejects.toMatchObject({ code: ERROR_CODE.ACCESS_BLOCKED })
     })
-
-    it('should throw INVALID_INPUT if password is incorrect', async () => {
+    it('should throw INVALID_INPUT if password is incorrect', async() => {
       vi.mocked(Hasher.compare).mockResolvedValue(false)
       mockRepo.findByEmail.mockResolvedValue(user)
 
       await expect(service.login('user@test.com', 'wrongPassword'))
-        .rejects.toMatchObject({ code: ERROR_CODE.INVALID_INPUT })
+        .rejects.toMatchObject({ code: ERROR_CODE.INVALID_CREDENTIALS })
     })
   })
 
   // ── getAllUsers ───────────────────────────────────────────────────────────────
 
   describe('getAllUsers', () => {
-    it('should return list mapped to public user objects without password', async () => {
+    it('should return list mapped to public user objects without password', async() => {
       mockRepo.getAll.mockResolvedValue([user.toPersistence()])
 
       const result = await service.getAllUsers()
@@ -529,7 +530,7 @@ describe('UserService', () => {
       expect(result[0]).not.toHaveProperty('password')
     })
 
-    it('should return an empty array if no users exist', async () => {
+    it('should return an empty array if no users exist', async() => {
       mockRepo.getAll.mockResolvedValue([])
 
       const result = await service.getAllUsers()
@@ -541,7 +542,7 @@ describe('UserService', () => {
   // ── getUserById ───────────────────────────────────────────────────────────────
 
   describe('getUserById', () => {
-    it('should delegate to repository getPublicById and return the result', async () => {
+    it('should delegate to repository getPublicById and return the result', async() => {
       const dto = user.toDTO()
       mockRepo.getPublicById.mockResolvedValue(dto)
 
@@ -551,7 +552,7 @@ describe('UserService', () => {
       expect(result).toEqual(dto)
     })
 
-    it('should return null if getPublicById does not find user', async () => {
+    it('should return null if getPublicById does not find user', async() => {
       mockRepo.getPublicById.mockResolvedValue(null)
 
       const result = await service.getUserById('non_existent')

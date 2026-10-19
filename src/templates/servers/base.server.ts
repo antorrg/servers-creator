@@ -184,7 +184,8 @@ ${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
 export default defineConfig({
   test: {
     environment: 'node',
-    globals: true
+    globals: true,
+    fileParallelism: false
   }
 })`
 },

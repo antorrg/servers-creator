@@ -1,6 +1,6 @@
 import { authPrehandler,} from "./authPreHandlers.js";
 import { authService, authController, authRouter } from "./feature.auth.js";
-import { integrationTest1, integrationTest2, featureTestHelper } from "./featureTest.js";
+import { integrationTest1, integrationTest1b, integrationTest2, featureTestHelper } from "./featureTest.js";
 import {  session, sessionTest, testHelperAuth } from "./session.js";
 import { connectSessionApp } from "./sessionDb.js";
 
@@ -10,6 +10,7 @@ export {
     authController,
     authRouter,
     integrationTest1,
+    integrationTest1b,
     integrationTest2,
     featureTestHelper,
     session,

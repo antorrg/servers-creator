@@ -11,18 +11,16 @@ import serverAuth, {
   mockAdmin,
   mockDisabled,
   getUserid
-} from './testHelpers/serverAuth.help.js'
+} from './testHelpers/serverAuth.help.js'`
 
-function getCsrfToken(res: any): string {
-  const setCookie = res.get('Set-Cookie')
-  if (!setCookie) return ''
-  const csrfCookie = setCookie.find((c: string) => c.includes('XSRF-TOKEN'))
-  if (!csrfCookie) return ''
-  const rawToken = csrfCookie.split('=')[1].split(';')[0]
-  return decodeURIComponent(rawToken)
-}`
-
-export const integrationTest2 = `
+export const integrationTest2 = `function getCsrfToken(res: any): string {
+    const setCookie = res.get('Set-Cookie')
+    if (!setCookie) return ''
+    const csrfCookie = setCookie.find((c: string) => c.includes('XSRF-TOKEN'))
+    if (!csrfCookie) return ''
+    const rawToken = csrfCookie.split('=')[1].split(';')[0]
+    return decodeURIComponent(rawToken)
+  }
   describe('1. CSRF Protection Integration', () => {
     it('should generate an XSRF-TOKEN cookie on initial GET request', async() => {
       const agent = session.agent(serverAuth)
@@ -261,7 +259,7 @@ export const integrationTest2 = `
       expect(res.body.code).toBe('INVALID_CREDENTIALS')
     })
 
-    it('should fail login when user account is disabled with identical INVALID_CREDENTIALS code', async() => {
+    it('should fail login when user account is disabled with ACCESS_BLOCKED', async() => {
       const agent = session.agent(serverAuth)
       const initRes = await agent.get('/test/csrf')
       const token = getCsrfToken(initRes)
@@ -271,9 +269,9 @@ export const integrationTest2 = `
         .set('x-csrf-token', token)
         .send(mockDisabled)
 
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(401)
       expect(res.body.ok).toBe(false)
-      expect(res.body.code).toBe('INVALID_CREDENTIALS')
+      expect(res.body.code).toBe('ACCESS_BLOCKED')
     })
 
 
@@ -295,8 +293,8 @@ export const integrationTest2 = `
       expect(res2.status).toBe(200)
     })
   })
-})
-`
+})`
+
 export const featureTestHelper = `import express from 'express'
 import cookieParser from 'cookie-parser'
 import * as eh from '../../../configs/errors'
