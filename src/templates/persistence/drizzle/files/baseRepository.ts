@@ -4,45 +4,51 @@
  * baseRepositoryTestHelp
  */
 
-export const baseRepository = `import { eq, and, asc, desc, count, type Table } from 'drizzle-orm'
+export const baseRepository = `import { eq, and, asc, desc, count, getTableColumns, type Column, type SQL, type InferSelectModel, type InferInsertModel } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type { PgTable, PgUpdateSetSource } from 'drizzle-orm/pg-core'
 import { db as defaultDb } from '../../configs/database.js'
 import type { IBaseRepository, IPaginatedOptions, IPaginatedResults } from '../interfaces/base.interface.js'
 import { throwError, ERROR_CODE } from '../../configs/errors.js'
 
 export class BaseRepository<
   TDTO,
-  TCreate extends Record<string, any>,
-  TUpdate = Partial<TCreate>,
-  TTable extends Table = any
+  TCreate extends object = Record<string, unknown>,
+  TUpdate extends object = Partial<TCreate>,
+  TTable extends PgTable = PgTable
 > implements IBaseRepository<TDTO, TCreate, TUpdate> {
   constructor(
     private readonly table: TTable,
-    private readonly parserFn: (model: any) => TDTO,
+    private readonly parserFn: (model: InferSelectModel<TTable>) => TDTO,
     private readonly modelName: string = 'Model',
-    private readonly whereField: keyof TDTO & string = 'id' as any,
-    private readonly database: NodePgDatabase<any> = defaultDb
+    private readonly whereField: (keyof TDTO & string) | string = 'id',
+    private readonly database: NodePgDatabase = defaultDb
   ) {}
+
+  private getColumn(name: string): Column | undefined {
+    const columns = getTableColumns(this.table) as Record<string, Column | undefined>
+    return columns[name]
+  }
 
   async getAll(
     field?: unknown,
     whereField?: keyof TDTO | string
   ): Promise<TDTO[]> {
     const targetField = (whereField ?? this.whereField) as string
-    const column = (this.table as any)[targetField]
+    const column = this.getColumn(targetField)
 
     if (field !== undefined && field !== null && column) {
-      const records = await this.database
+      const records = (await this.database
         .select()
-        .from(this.table as any)
-        .where(eq(column, field))
-      return records.map(this.parserFn)
+        .from(this.table as PgTable)
+        .where(eq(column, field as Column['_']['data']))) as InferSelectModel<TTable>[]
+      return records.map((record) => this.parserFn(record))
     }
 
-    const records = await this.database
+    const records = (await this.database
       .select()
-      .from(this.table as any)
-    return records.map(this.parserFn)
+      .from(this.table as PgTable)) as InferSelectModel<TTable>[]
+    return records.map((record) => this.parserFn(record))
   }
 
   async getWithPages(
@@ -52,52 +58,52 @@ export class BaseRepository<
     const limit = options?.limit ?? 10
     const skip = (page - 1) * limit
 
-    const conditions: any[] = []
+    const conditions: SQL[] = []
     if (options?.query) {
       for (const [key, val] of Object.entries(options.query)) {
         if (val !== undefined && val !== null) {
-          const col = (this.table as any)[key]
+          const col = this.getColumn(key)
           if (col) {
-            conditions.push(eq(col, val))
+            conditions.push(eq(col, val as Column['_']['data']))
           }
         }
       }
     }
 
     const whereCondition = conditions.length > 0
-      ? conditions.reduce((acc, cond) => and(acc, cond))
+      ? and(...conditions)
       : undefined
 
-    const orderClauses: any[] = []
+    const orderClauses: SQL[] = []
     if (options?.order && Object.keys(options.order).length > 0) {
       for (const [key, dir] of Object.entries(options.order)) {
-        const col = (this.table as any)[key]
+        const col = this.getColumn(key)
         if (col) {
           const isAsc = String(dir).toUpperCase() === 'ASC' || dir === 1
           orderClauses.push(isAsc ? asc(col) : desc(col))
         }
       }
     } else {
-      const defaultCol = (this.table as any)[this.whereField] ?? (this.table as any)['id']
+      const defaultCol = this.getColumn(String(this.whereField)) ?? this.getColumn('id')
       if (defaultCol) {
         orderClauses.push(asc(defaultCol))
       }
     }
 
-    let dataQuery = this.database.select().from(this.table as any)
+    let dataQuery = this.database.select().from(this.table as PgTable).$dynamic()
     if (whereCondition) {
-      dataQuery = dataQuery.where(whereCondition) as any
+      dataQuery = dataQuery.where(whereCondition)
     }
     if (orderClauses.length > 0) {
-      dataQuery = dataQuery.orderBy(...orderClauses) as any
+      dataQuery = dataQuery.orderBy(...orderClauses)
     }
-    dataQuery = dataQuery.limit(limit).offset(skip) as any
+    dataQuery = dataQuery.limit(limit).offset(skip)
 
-    const data = await dataQuery
+    const data = (await dataQuery) as InferSelectModel<TTable>[]
 
-    let countQuery = this.database.select({ count: count() }).from(this.table as any)
+    let countQuery = this.database.select({ count: count() }).from(this.table as PgTable).$dynamic()
     if (whereCondition) {
-      countQuery = countQuery.where(whereCondition) as any
+      countQuery = countQuery.where(whereCondition)
     }
     const countResult = await countQuery
     const total = Number(countResult[0]?.count ?? 0)
@@ -109,17 +115,18 @@ export class BaseRepository<
         limit,
         totalPages: Math.ceil(total / limit)
       },
-      data: data.map(this.parserFn)
+      data: data.map((record) => this.parserFn(record))
     }
   }
 
   async getById(id: string | number): Promise<TDTO> {
-    const idCol = (this.table as any)['id']
+    const idCol = this.getColumn('id')
     if (!idCol) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
-    const [record] = await this.database
+    const records = (await this.database
       .select()
-      .from(this.table as any)
-      .where(eq(idCol, id))
+      .from(this.table as PgTable)
+      .where(eq(idCol, id))) as InferSelectModel<TTable>[]
+    const record = records[0]
     if (!record) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
     return this.parserFn(record)
   }
@@ -129,14 +136,15 @@ export class BaseRepository<
     whereField: keyof TDTO | string = this.whereField
   ): Promise<TDTO | null> {
     if (field == null) {
-      throwError(ERROR_CODE.REQUIRED_FIELD_MISSING, \`No value provided for \${whereField as string}\`)
+      throwError(ERROR_CODE.REQUIRED_FIELD_MISSING, \`No value provided for \${String(whereField)}\`)
     }
-    const column = (this.table as any)[whereField as string]
+    const column = this.getColumn(String(whereField))
     if (!column) return null
-    const [record] = await this.database
+    const records = (await this.database
       .select()
-      .from(this.table as any)
-      .where(eq(column, field))
+      .from(this.table as PgTable)
+      .where(eq(column, field as Column['_']['data']))) as InferSelectModel<TTable>[]
+    const record = records[0]
     return record ? this.parserFn(record) : null
   }
 
@@ -149,9 +157,9 @@ export class BaseRepository<
 
   async create(data: TCreate): Promise<TDTO> {
     const [created] = (await this.database
-      .insert(this.table as any)
-      .values(data as any)
-      .returning()) as any[]
+      .insert(this.table)
+      .values(data as unknown as InferInsertModel<TTable>)
+      .returning()) as InferSelectModel<TTable>[]
     return this.parserFn(created)
   }
 
@@ -159,26 +167,26 @@ export class BaseRepository<
     id: string | number,
     data: TUpdate
   ): Promise<TDTO> {
-    const idCol = (this.table as any)['id']
+    const idCol = this.getColumn('id')
     if (!idCol) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
     await this.getById(id)
     const [updated] = (await this.database
-      .update(this.table as any)
-      .set(data as any)
+      .update(this.table)
+      .set(data as unknown as PgUpdateSetSource<TTable>)
       .where(eq(idCol, id))
-      .returning()) as any[]
+      .returning()) as InferSelectModel<TTable>[]
     return this.parserFn(updated)
   }
 
   async delete(id: string | number): Promise<string> {
-    const idCol = (this.table as any)['id']
+    const idCol = this.getColumn('id')
     if (!idCol) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
     const existing = await this.getById(id)
-    const value = (existing as any)[this.whereField] ?? id
+    const value = (existing as Record<string, unknown>)[this.whereField] ?? id
     await this.database
-      .delete(this.table as any)
+      .delete(this.table)
       .where(eq(idCol, id))
-    return \`\${value} deleted successfully\`
+    return \`\${String(value)} deleted successfully\`
   }
 }`
 export const baseRepositoryTest = `import { beforeAll, afterAll, describe, it, expect } from 'vitest'

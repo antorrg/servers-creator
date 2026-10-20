@@ -5,7 +5,8 @@ export const testOrms = (options:ProjectConfig)=>{
 
  const objectTest = {   
   dbImportPrisma:'',
-  prisma:`describe('Database existence', () => {
+  prisma:`
+  describe('Database existence', () => {
     it('should query tables and return an empty array', async () => {
         const results = await Promise.all([
         db.prisma.user.findMany(),
@@ -19,7 +20,8 @@ export const testOrms = (options:ProjectConfig)=>{
     })
   })`,
   dbImportSequelize:'',
-  sequelize: `describe('Database existence', () => {
+  sequelize: `
+  describe('Database existence', () => {
     it('should query tables and return an empty array', async() => { 
       const models = [ 
         db.Log,
@@ -35,7 +37,8 @@ export const testOrms = (options:ProjectConfig)=>{
   })
     `,
   dbImportDrizzle:"import * as sch from '../schemas/index.schemas.js'",
-  drizzle: `describe('Database existence', () => {
+  drizzle: `
+  describe('Database existence', () => {
     it('should query tables and return an empty array', async () => {
       const results = await Promise.all([
         db.db.select().from(sch.user),

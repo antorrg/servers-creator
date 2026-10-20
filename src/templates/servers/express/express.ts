@@ -14,7 +14,6 @@ import morgan from 'morgan'
 import cors from 'cors'
 import * as eh from './configs/errors.js'
 import mainRouter from './routes.js'
-import envConfig from './configs/envConfig.js'
 ${(options.selectedAuth !== 'auth-null')?expressaAuthSnippet.import : ''}
 
 
@@ -64,7 +63,7 @@ path:`/${options.sourceFolderName}/index.ts`,
 file:`import app from './app.js'${options.selectedOrm !== 'none'?`\nimport { startUp } from './configs/database.js'`:''}
 import envConfig from './configs/envConfig.js'
 
-const message =\`Server is listening on port \${envConfig.Port}\\nServer in \${envConfig.Status}\\n 🚀​ Everything is allright!!\`
+const message =\`Server is listening on port \${envConfig.Port}\\nServer in \${envConfig.Status}\\n​Everything is allright!!\`
 async function serverBootstrap(){
   try{${options.selectedOrm !== 'none'?`\n      await startUp()`:''}
     app.listen(envConfig.Port,() => {
@@ -80,10 +79,10 @@ serverBootstrap()`
   path:`/${options.sourceFolderName}/shared/utils/responder.ts`,
   file: `import { type Response } from 'express'
 
-export function responder(
-  res:Response,
+export function responder<T>(
+  res: Response,
   status: number,
-  data: any
+  data: T
 ) {
   return res.status(status).json(data)
 }`
