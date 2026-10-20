@@ -219,8 +219,7 @@ const getStringEnv = (value:string):string => {
 const envConfig = {
   Port: getNumberEnv('PORT'),
   Status: NODE_ENV${databases.envConfigLine},
-  UserImg: getStringEnv('USER_IMG'),
-  ${(options.selectedAuth !== 'auth-null')?authEnvironment.envConfigLine: ''}
+  UserImg: getStringEnv('USER_IMG')${(options.selectedAuth !== 'auth-null')?authEnvironment.envConfigLine: ''}
 }
 export default envConfig
   `

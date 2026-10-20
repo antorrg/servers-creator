@@ -127,7 +127,7 @@ export class UserApplications{
     }
     return role
   }
-    static validatePasswordHash(prop:string):string{
+  static validatePasswordHash(prop:string):string{
     if(typeof prop !== 'string' || prop.length < 20) throw new Error('[UserDomain] Invalid password hash')
     return prop
   }

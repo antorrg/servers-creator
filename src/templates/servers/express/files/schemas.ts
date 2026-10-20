@@ -44,7 +44,7 @@ const logquery: Schema = {
 
 export default logquery;`
 
-export const userSchema = `import { Schema } from 'req-valid-express'
+export const userSchema = `import type { Schema } from 'req-valid-express'
 
 export const createUser:Schema = {
   email:{
@@ -54,7 +54,7 @@ export const createUser:Schema = {
     }
   },
   password:{
-      type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
@@ -62,25 +62,25 @@ export const createUser:Schema = {
 }
 export const updateProfile:Schema = {
   email:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
   },
   name:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
   },
   nickname:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
   },
   picture: {
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
@@ -88,19 +88,19 @@ export const updateProfile:Schema = {
 }
 export const changePassword:Schema={
   id:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
   },
   password:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
   },
   newPassword:{
-        type: 'string',
+    type: 'string',
     sanitize: {
       trim: true
     }
@@ -114,7 +114,7 @@ export const upgradeUser:Schema = {
     }
   },
   enabled: {
-        type: 'boolean',
+    type: 'boolean'
 
   }
 }`

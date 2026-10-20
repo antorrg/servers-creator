@@ -1,24 +1,23 @@
 // userService, userServiceTest
 
-export const userService = `import type { UserProps, UserUpdate } from './User.js'
+export const userService = `import type { UserUpdate } from './User.js'
 import { User } from './User.js'
-import type { UserRepository } from './UserRepository.js'
-import type { IUser } from './User.interfaces.js'
+import type { IUserRepository, IUser } from './User.interfaces.js'
 import { Hasher } from '../../shared/utils/Hasher.js'
 import { throwError, ERROR_CODE } from '../../configs/errors.js'
 
 export class UserService {
-  private userRepository: UserRepository
+  private userRepository: IUserRepository
   private handleImageDelete: (url:string) => Promise<string | undefined>
 
   constructor(
-    userRepository: UserRepository,
+    userRepository: IUserRepository,
     handleImageDelete: (url:string) => Promise<string | undefined>
   ) {
     this.userRepository = userRepository
     this.handleImageDelete= handleImageDelete
   }
-  private mapToPublic(record:any):Omit<UserProps, 'password'> {
+  private mapToPublic(record: IUser): IUser {
     return {
       id: record.id,
       email: record.email,
@@ -185,6 +184,7 @@ export const userServiceTest = `import { describe, it, expect, beforeEach, vi } 
 import { UserService } from './UserService.js'
 import type { UserProps } from './User.js'
 import { User } from './User.js'
+import type { IUserRepository } from './User.interfaces.js'
 import { ERROR_CODE } from '../../configs/errors.js'
 import { UuidHandler } from '../../shared/utils/UuidHandler.js'
 
@@ -234,7 +234,7 @@ const mockHandleImageDelete = vi.fn()
 
 function makeService() {
   return new UserService(
-    mockRepo as any,
+    mockRepo as unknown as IUserRepository,
     mockHandleImageDelete
   )
 }

@@ -14,35 +14,35 @@ const logger = new LoggerController(loggerServiceDb)
 const logRouter = express.Router()
 
 logRouter.get(
-    '/',
-    Validator.validateQuery(logQuery,{
+  '/',
+  Validator.validateQuery(logQuery,{
     searchField: ['levelName', 'message', 'status'],
     sortBy: ['id', 'time', 'createdAt'],
     order:['ASC', 'DESC']
     }),
-    logger.getAll
+  logger.getAll
 )
 
 logRouter.get(
-    '/:id', 
-    Validator.paramId('id', UuidHandler.uuidRegex),
-    logger.getById)
+  '/:id', 
+  Validator.paramId('id', UuidHandler.uuidRegex),
+  logger.getById)
 
 logRouter.patch(
-    '/:id', 
-    Validator.paramId('id', UuidHandler.uuidRegex),
-    Validator.validateBody({keep:{type:'boolean'}}),
-    logger.update)
+  '/:id', 
+  Validator.paramId('id', UuidHandler.uuidRegex),
+  Validator.validateBody({keep:{type:'boolean'}}),
+  logger.update)
 
 logRouter.delete(
-    '/:id', 
-    Validator.paramId('id', UuidHandler.uuidRegex),
-    logger.delete)
+  '/:id', 
+  Validator.paramId('id', UuidHandler.uuidRegex),
+  logger.delete)
 
 logRouter.delete(
-    '/:id/clean',
-    Validator.paramId('id', UuidHandler.uuidRegex),
-    logger.deleteAll)
+  '/:id/clean',
+  Validator.paramId('id', UuidHandler.uuidRegex),
+  logger.deleteAll)
 
 export default logRouter`
 
@@ -87,7 +87,7 @@ userRouter.post(
 )
 userRouter.patch(
   '/:userId/assign-status',
-   Validator.paramId('userId',UuidHandler.uuidValidator),
+  Validator.paramId('userId',UuidHandler.uuidValidator),
   Validator.validateBody(sch.upgradeUser),
   controller.userUpgrade
 )

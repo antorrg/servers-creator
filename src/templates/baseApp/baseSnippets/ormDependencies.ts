@@ -51,7 +51,7 @@ export function ormDependencies(options: ProjectConfig){
 const postgresLines = {
 environmentLine: 'DATABASE_URL=postgres://userName:password@localhost:5432/dbName',
 envConfigLine: `,
-   DatabaseUrl: getStringEnv('DATABASE_URL')`,
+  DatabaseUrl: getStringEnv('DATABASE_URL')`,
 }
 const singleLines = {
 environmentLine: '',

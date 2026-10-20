@@ -212,7 +212,7 @@ export {
   middError,
   errorHandler,
   jsonFormat,
-  notFoundRoute,
+  notFoundRoute
 }
     `
   }
