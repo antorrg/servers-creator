@@ -2,8 +2,8 @@ import type { ProjectConfig } from "../../../types.js"
 
 const fileSession = {
   import: `import Session from './session.model.js'`,
-  line: `
-  Session,`
+  line: `,
+  Session`
 }
 const fileRefresh = {
     import: `import RefreshToken from './refreshToken.model.js'`,

@@ -15,8 +15,8 @@ import Log from './log.model.js'
 ${authIndex.import}
 
 export default {
-    User,
-    Log,${authIndex.line}
+  User,
+  Log${authIndex.line}
 }`
     },
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -25,12 +25,12 @@ export default {
      {
         path:`/${options.sourceFolderName}/configs/database.ts`,
         file: `${dep.database1}
-  Log,${authIndex.line}
+  Log${authIndex.line}
 ${dep.database2}
-    Log,${authIndex.line}
-    sequelize,
-    startUp,
-    closeDatabase
+  Log${authIndex.line},
+  sequelize,
+  startUp,
+  closeDatabase
 }`
     },    
     {

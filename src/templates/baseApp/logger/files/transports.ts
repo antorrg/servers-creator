@@ -2,8 +2,7 @@
  * fileTransport
  * dbTransport
  */
-export const fileTransport = `
-export function fileTransport () {
+export const fileTransport = `export function fileTransport() {
   return {
     target: 'pino-pretty',
     options: {

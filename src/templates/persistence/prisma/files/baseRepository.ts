@@ -4,40 +4,60 @@
  * baseRepositoryTestHelp
  */
 
-export const baseRepository = `import type { IBaseRepository, IPaginatedOptions, IPaginatedResults, Direction } from '../interfaces/base.interface.js'
+export const baseRepository = `import type { IBaseRepository, IPaginatedOptions, IPaginatedResults } from '../interfaces/base.interface.js'
 import { throwError, ERROR_CODE } from '../../configs/errors.js'
 
+/**
+ * Contrato base para los delegates generados por Prisma
+ */
+export interface IPrismaDelegate<TRecord = unknown> {
+  findMany(args?: {
+    where?: Record<string, unknown>
+    orderBy?: Record<string, 'asc' | 'desc'> | Record<string, 'asc' | 'desc'>[]
+    skip?: number
+    take?: number
+  }): Promise<TRecord[]>
+  findUnique(args: { where: Record<string, unknown> }): Promise<TRecord | null>
+  findFirst(args?: { where?: Record<string, unknown> }): Promise<TRecord | null>
+  create(args: { data: unknown }): Promise<TRecord>
+  update(args: { where: Record<string, unknown>; data: unknown }): Promise<TRecord>
+  delete(args: { where: Record<string, unknown> }): Promise<TRecord>
+  count(args?: { where?: Record<string, unknown> }): Promise<number>
+  name?: string
+}
+
+/**
+ * Infiere el modelo de datos propio de Prisma (TRecord) a partir del Delegate proporcionado
+ */
+export type PrismaModelRecord<TModel> =
+  TModel extends { findFirst(...args: any[]): Promise<infer R | null> }//eslint-disable-line
+    ? NonNullable<R>
+    : TModel extends { findMany(...args: any[]): Promise<Array<infer R>> }//eslint-disable-line
+    ? R
+    : Record<string, unknown>
 
 export class BaseRepository<
   TDTO,
-  TCreate extends Record<string, any>,
+  TCreate extends Record<string, any> = any,//eslint-disable-line
   TUpdate = Partial<TCreate>,
-  TModel extends {
-    findMany: Function
-    findUnique: Function
-    findFirst: Function
-    create: Function
-    update: Function
-    delete: Function
-    count: Function
-    name?: string
-  } = any
+  TModel extends IPrismaDelegate<any> = any,//eslint-disable-line
+  TRecord extends Record<string, any> = PrismaModelRecord<TModel>//eslint-disable-line
 > implements IBaseRepository<TDTO, TCreate, TUpdate> {
   constructor(
     private readonly Model: TModel,
-    private readonly parserFn: (model: any) => TDTO,
+    private readonly parserFn: (model: TRecord) => TDTO,
     private readonly modelName: string = Model.name ?? 'Model',
-    private readonly whereField: keyof TDTO & string,
+    private readonly whereField: (keyof TRecord | keyof TDTO) & string,
+    private readonly idField: keyof TRecord & string = ('id' as unknown) as keyof TRecord & string
   ) {}
 
   async getAll(
     field?: unknown,
     whereField?: keyof TDTO | string
   ): Promise<TDTO[]> {
-    const whereClause = whereField != null && field != null
-  ? { [whereField]: field }
-  : {}
-    const models = await this.Model.findMany({ where: whereClause })
+    const key = (whereField ?? this.whereField) as string
+    const whereClause = field != null ? { [key]: field } : {}
+    const models: TRecord[] = await this.Model.findMany({ where: whereClause })
     return models.map(this.parserFn)
   }
 
@@ -46,24 +66,22 @@ export class BaseRepository<
   ): Promise<IPaginatedResults<TDTO>> {
     const page = options?.page ?? 1
     const limit = options?.limit ?? 10
-    const whereClause = options?.query ?? {}
+    const whereClause = (options?.query ?? {}) as Record<string, unknown>
     const skip = (page - 1) * limit
 
-  const orderClause = options?.order
-  ? Object.entries(options.order).map(([field, dir]) => ({
-      [field]:
-        String(dir).toLowerCase() === 'asc'? 'asc' : 'desc'
-    }))
-  : { [this.whereField]: 'asc' }
+    const orderClause = options?.order
+      ? Object.entries(options.order).map(([field, dir]) => ({
+        [field]: (String(dir).toLowerCase() === 'asc' ? 'asc' : 'desc') as 'asc' | 'desc'
+      }))
+      : [{ [this.whereField]: 'asc' as const }]
 
-    const data = await this.Model.findMany({
-        where: whereClause,
-        orderBy: orderClause,
-        skip,
-        take: limit,
-      })
-     const total = await this.Model.count({ where: whereClause })
-    
+    const data: TRecord[] = await this.Model.findMany({
+      where: whereClause,
+      orderBy: orderClause,
+      skip,
+      take: limit
+    })
+    const total = await this.Model.count({ where: whereClause })
 
     return {
       info: {
@@ -77,68 +95,69 @@ export class BaseRepository<
   }
 
   async getById(id: string | number): Promise<TDTO> {
-    const model = await this.Model.findUnique({ where: { id: id } })
+    const model: TRecord | null = await this.Model.findUnique({
+      where: { [this.idField]: id }
+    })
     if (!model) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
     return this.parserFn(model)
-
   }
-
 
   async findByField(
     field: unknown,
     whereField: keyof TDTO | string = this.whereField
   ): Promise<TDTO | null> {
-    if (field == null) throwError(ERROR_CODE.REQUIRED_FIELD_MISSING, \`No value provided for \${(whereField as string)}\`)
-    const model = await this.Model.findFirst({
-      where: { [whereField]: field }
+    if (field == null) {
+      throwError(ERROR_CODE.REQUIRED_FIELD_MISSING, \`No value provided for \${String(whereField)}\`)
+    }
+    const model: TRecord | null = await this.Model.findFirst({
+      where: { [whereField as string]: field }
     })
     return model ? this.parserFn(model) : null
   }
 
   async create(data: TCreate): Promise<TDTO> {
-    const model = await this.Model.create({ data })
-    return  this.parserFn(model)
+    const model: TRecord = await this.Model.create({ data })
+    return this.parserFn(model)
   }
 
   async update(
     id: string | number,
     data: TUpdate
   ): Promise<TDTO> {
-    const model = await this.Model.findUnique({ where: { id: id } })
+    const model = await this.Model.findUnique({ where: { [this.idField]: id } })
     if (!model) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
-    const updated = await this.Model.update({
-      where: { id:id },
+    const updated: TRecord = await this.Model.update({
+      where: { [this.idField]: id },
       data
     })
-    return  this.parserFn(updated)
-    
+    return this.parserFn(updated)
   }
 
   async delete(id: string | number): Promise<string> {
-    const model = await this.Model.findUnique({ where: { id: id } })
+    const model: TRecord | null = await this.Model.findUnique({ where: { [this.idField]: id } })
     if (!model) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
-    const value = (model as any)[this.whereField]
-    await this.Model.delete({ where: { id: id } })
-    return \`\${value} deleted successfully\`
+    const value = (model as Record<string, unknown>)[this.whereField]
+    await this.Model.delete({ where: { [this.idField]: id } })
+    return \`\${String(value)} deleted successfully\`
   }
 }`
 export const baseRepositoryTest = `import { beforeAll, afterAll, describe, it, expect } from 'vitest'
-import { startUp, closeDatabase, prisma} from '../../configs/database.ts'
+import { startUp, closeDatabase, prisma } from '../../configs/database.ts'
 import { BaseRepository } from './BaseRepository.ts'
 import * as help from './testHelpers/testHelp.help.ts'
 
 
 describe('BaseRepository unit test', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     await startUp(true)
   })
-  afterAll(async () => {
+  afterAll(async() => {
     await closeDatabase()
   })
   const UserModel = prisma.user
   const test = new BaseRepository(UserModel, help.parser, 'User', 'email')
   describe('Create method', () => {
-    it('should create a element', async () => {
+    it('should create a element', async() => {
       const response = await test.create(help.dataCreate)
       expect(response).toEqual({
         id: expect.any(String),
@@ -154,18 +173,18 @@ describe('BaseRepository unit test', () => {
   })
   describe('Get methods', () => {
     describe('"getAll" method', () => {
-      it('should retrieve an array of elements', async () => {
+      it('should retrieve an array of elements', async() => {
         await help.createSeedRandomElements(UserModel, help.usersSeed)
         const response = await test.getAll()
         expect(response.length).toBe(16)
       })
-      it('Should retrieve an array of elements filtered by query', async () => {
+      it('Should retrieve an array of elements filtered by query', async() => {
         const response = await test.getAll(false, 'enabled')
         expect(response.length).toBe(3)
       })
     })
     describe('"getById" method', () => {
-      it('Should retrieve an element by Id', async () => {
+      it('Should retrieve an element by Id', async() => {
         const response = await test.getById(help.getStringId())
         expect(response).toEqual({
           id: expect.any(String),
@@ -178,9 +197,9 @@ describe('BaseRepository unit test', () => {
         })
       })
     })
-    describe('"getByField" method', () => {
-      it('Should retrieve an element by field', async () => {
-        const response = await test.getByField('user15@email.com', 'email')
+    describe('"findByField" method', () => {
+      it('Should retrieve an element by field', async() => {
+        const response = await test.findByField('user15@email.com', 'email')
         expect(response).toEqual({
           id: expect.any(String),
           email: 'user15@email.com',
@@ -193,14 +212,14 @@ describe('BaseRepository unit test', () => {
       })
     })
     describe('"getWithPages" method', () => {
-      it('Should retrieve an array of paginated elements', async () => {
-        const queryObject = { page: 1, limit: 10,}as const
+      it('Should retrieve an array of paginated elements', async() => {
+        const queryObject = { page: 1, limit: 10 }as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 16, page: 1, limit: 10, totalPages: 2 })
         expect(response.data.length).toBe(10)
         expect(response.data.map(a => a.name)).toEqual(['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'])// Order
       })
-      it('Should retrieve filtered and sorted elements', async () => {
+      it('Should retrieve filtered and sorted elements', async() => {
         const queryObject = { page: 1, limit: 10, query: { enabled: false }, order: { name: 'ASC' } } as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 3, page: 1, limit: 10, totalPages: 1 })
@@ -210,7 +229,7 @@ describe('BaseRepository unit test', () => {
     })
   })
   describe('Update method', () => {
-    it('should update an element', async () => {
+    it('should update an element', async() => {
       const data = { name: 'Name of user' }
       const response = await test.update(help.getStringId(), data)
       expect(response).toEqual({
@@ -220,7 +239,7 @@ describe('BaseRepository unit test', () => {
     })
   })
   describe('Delete method', () => {
-    it('should deleted an element', async () => {
+    it('should deleted an element', async() => {
       const response = await test.delete(help.getStringId())
       expect(response).toBe('user@email.com deleted successfully')
     })
@@ -278,19 +297,22 @@ export const dataUpdate: UpdateUserInput = {
   enabled: true
 }
 let stringId:string = ''
-export const setStringId = (id:string):void=>{
+export const setStringId = (id:string):void => {
   stringId = id
 }
-export const getStringId = ():string =>{
+export const getStringId = ():string => {
   return stringId
 }
 //* --------------------------------------------------
 // ?          UserSeed
 //* ------------------------------------------------
-export const createSeedRandomElements = async (model: any, seed: unknown[]) => {
+export const createSeedRandomElements = async(
+  model: { createMany: (args: { data: any }) => Promise<unknown> },//eslint-disable-line
+  seed: unknown[]
+) => {
   try {
     if (!seed || seed.length === 0) throw new Error('No data')
-    await model.createMany({data: seed})
+    await model.createMany({ data: seed })
   } catch (error) {
     console.error('Error createSeedRandomElements: ', error)
   }

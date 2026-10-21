@@ -146,7 +146,7 @@ describe('Session & CSRF Auth tests', () => {
     const protectedRes = await agent.get('/protected')
     expect(protectedRes.status).toBe(401)  })
 })`
-export const testHelperAuth = `import express, {type Request, type Response, } from 'express'
+export const testHelperAuth = `import express, { type Request, type Response } from 'express'
 import { sessionMiddleware } from '../session.js'
 import { csrfProtection, setCsrfToken, verifyCsrfToken, isAuthenticated, authorize, UserRole, Auth } from '../authMiddlewares.js'
 import cookieParser from 'cookie-parser'

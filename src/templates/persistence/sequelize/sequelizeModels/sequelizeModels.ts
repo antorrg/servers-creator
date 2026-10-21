@@ -2,8 +2,8 @@
  
 export const userModel = {
         subPath:`user.model.ts`,
-        file: `import { Model, DataTypes } from 'sequelize'
-  import type { 
+        file:`import { Model, DataTypes } from 'sequelize'
+import type { 
   Sequelize,
   CreationOptional, 
   InferAttributes, 
@@ -194,7 +194,7 @@ export default (sequelize: Sequelize) => {
 export const sessionModel = {
       subPath: `session.model.ts`,
       file:`import { Model, DataTypes } from 'sequelize'
-  import type { 
+import type { 
   Sequelize,
   CreationOptional,
   InferAttributes, 
@@ -247,7 +247,7 @@ export default initSessionModel
 export const refreshModel = {
   subPath: 'refreshToken.model.ts',
   file: `import { Model, DataTypes } from 'sequelize'
-  import type { 
+import type { 
   Sequelize,
   CreationOptional,
   InferAttributes, 

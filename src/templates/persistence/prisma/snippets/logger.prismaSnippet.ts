@@ -18,7 +18,7 @@ import {
 export { LogLevel }
 
 export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
-  protected get Model (): PrismaClient['log'] {
+  protected get Model(): PrismaClient['log'] {
     return prisma.log
   }
 
@@ -47,7 +47,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Get paginated results
    */
-  async getAll (options: IPagesOptions<ILogger> = {}): Promise<IPaginatedResponse> {
+  async getAll(options: IPagesOptions<ILogger> = {}): Promise<IPaginatedResponse> {
     try {
       const {
         searchField = '',
@@ -96,7 +96,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Get single log by ID
    */
-  async getById (id: string): Promise<ILogger> {
+  async getById(id: string): Promise<ILogger> {
     try {
       const record = await this.Model.findUnique({
         where: { id }
@@ -115,7 +115,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Create new log record
    */
-  async create (data: Prisma.LogCreateInput): Promise<ILogger> {
+  async create(data: Prisma.LogCreateInput): Promise<ILogger> {
     try {
       const record = await this.Model.create({ data })
       return this.parserFn(record)
@@ -127,7 +127,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Update keep flag or other allowed fields
    */
-  async update (id: string, data: LoggerUpdate): Promise<IActionResponse> {
+  async update(id: string, data: LoggerUpdate): Promise<IActionResponse> {
     try {
       const record = await this.Model.findUnique({
         where: { id }
@@ -154,7 +154,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Delete single log
    */
-  async delete (id: string): Promise<string> {
+  async delete(id: string): Promise<string> {
     try {
       const record = await this.Model.findUnique({
         where: { id }
@@ -177,7 +177,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Delete all logs except those marked as keep = true
    */
-  async deleteAll (): Promise<string> {
+  async deleteAll(): Promise<string> {
     try {
       await this.Model.deleteMany({
         where: {

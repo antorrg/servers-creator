@@ -36,7 +36,7 @@ async function closeDatabase() {
     await pool.end()
   } catch (error) {
     logger.error(error)
-     throw error
+    throw error
   }
 }
 

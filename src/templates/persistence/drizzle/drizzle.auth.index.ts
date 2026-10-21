@@ -2,8 +2,8 @@ import type { ProjectConfig } from "../../../types.js"
 
 const fileSession = {
   import: `import { session } from './session.schema.js'`,
-  line: `
-  session,`
+  line: `,
+  session`
 }
 const emptyFile = {
   

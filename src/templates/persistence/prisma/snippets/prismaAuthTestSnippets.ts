@@ -1,7 +1,7 @@
 
 export const prismaAuthTestFastify =`import * as db from '../../configs/database.js'
 
-describe('Auth Integration Tests', () => {
+describe('Auth Integration Tests',() => {
 
   beforeAll(async() => {
     await db.startUp(true)
@@ -14,9 +14,10 @@ describe('Auth Integration Tests', () => {
     await db.closeDatabase()
   })`
 
-  export const prismaAuthTestExpress =`import * as db from '../../configs/database.js'
+export const prismaAuthTestExpress =`
+import * as db from '../../configs/database.js'
 
-describe('Auth Integration Tests', () => {
+describe('Auth Integration Tests',() => {
 
   beforeAll(async() => {
     await db.startUp(true)

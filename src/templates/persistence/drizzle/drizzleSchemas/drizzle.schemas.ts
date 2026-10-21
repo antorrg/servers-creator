@@ -57,15 +57,15 @@ export const sessionSchema = {
       file:`import { pgTable, index, varchar, timestamp, text } from 'drizzle-orm/pg-core'
 
 export const session = pgTable('session', {
-    sid: varchar('sid', { length: 80 }).primaryKey(),
-    expires: timestamp('expires', { withTimezone: true, mode: 'date' }).notNull(),
-    data: text('data').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
-}, (table)=>{
-    return {
-       expiresIdx: index('expires_idx').on(table.expires)
-    }
+  sid: varchar('sid', { length: 80 }).primaryKey(),
+  expires: timestamp('expires', { withTimezone: true, mode: 'date' }).notNull(),
+  data: text('data').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' })
+},(table) => {
+  return {
+    expiresIdx: index('expires_idx').on(table.expires)
+  }
 }
 )
 `}

@@ -1,48 +1,48 @@
 /**
  * logSchema, userSchema
  */
-export const logSchema = `import type { Schema } from "req-valid-express";
+export const logSchema = `import type { Schema } from 'req-valid-express'
 
 const logquery: Schema = {
   page: {
-    type: "int",
+    type: 'int',
     default: 1
   },
   limit: {
-    type: "int",
+    type: 'int',
     default: 5
   },
   searchField: {
-    type: "string",
-    default: "levelName",
+    type: 'string',
+    default: 'levelName',
     sanitize: {
       trim: true
     }
   },
   search: {
-    type: "string",
-    default: "",
+    type: 'string',
+    default: '',
     sanitize: {
       trim: true
     }
   },
   sortBy: {
-    type: "string",
-    default: "id",
+    type: 'string',
+    default: 'id',
     sanitize: {
       trim: true
     }
   },
   order: {
-    type: "string",
-    default: "ASC",
+    type: 'string',
+    default: 'ASC',
     sanitize: {
       trim: true
     }
   }
-};
+}
 
-export default logquery;`
+export default logquery`
 
 export const userSchema = `import type { Schema } from 'req-valid-express'
 

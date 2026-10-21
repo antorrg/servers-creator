@@ -3,7 +3,6 @@ export const loggerServiceDbSequelize ={
   file:`import { throwError, processError, ERROR_CODE } from '../errors.js'
 import { Op } from 'sequelize'
 import { LogLevel, Log } from '../../models/log.model.js'
-import { UuidHandler } from '../../shared/utils/UuidHandler.js'
 import {
   type ILogger,
   type LoggerUpdate,
@@ -19,7 +18,7 @@ export { LogLevel }
 export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   protected readonly Model: typeof Log
 
-  constructor () {
+  constructor() {
     this.Model = Log
   }
 
@@ -48,7 +47,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Get paginated results
    */
-  async getAll (options: IPagesOptions<ILogger> = {}): Promise<IPaginatedResponse> {
+  async getAll(options: IPagesOptions<ILogger> = {}): Promise<IPaginatedResponse> {
     try {
       const {
         searchField = '',
@@ -92,7 +91,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Get single log by ID
    */
-  async getById (id: string): Promise<ILogger> {
+  async getById(id: string): Promise<ILogger> {
     try {
       const record = await this.Model.findByPk(id)
 
@@ -109,7 +108,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Create new log record
    */
-  async create (data: LoggerCreate): Promise<ILogger> {
+  async create(data: LoggerCreate): Promise<ILogger> {
     try {
       const record = await this.Model.create(data)
       return this.parserFn(record)
@@ -121,7 +120,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Update keep flag or other allowed fields
    */
-  async update (id: string, data: LoggerUpdate): Promise<IActionResponse> {
+  async update(id: string, data: LoggerUpdate): Promise<IActionResponse> {
     try {
       const record = await this.Model.findByPk(id)
 
@@ -143,7 +142,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Delete single log
    */
-  async delete (id: string): Promise<string> {
+  async delete(id: string): Promise<string> {
     try {
       const record = await this.Model.findByPk(id)
 
@@ -162,7 +161,7 @@ export class LoggerServiceDb implements ILoggerService<ILogger, LoggerUpdate> {
   /**
    * Delete all logs except those marked as keep = true
    */
-  async deleteAll (): Promise<string> {
+  async deleteAll(): Promise<string> {
     try {
       await this.Model.destroy({
         where: {

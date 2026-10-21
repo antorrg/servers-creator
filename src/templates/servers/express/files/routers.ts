@@ -19,7 +19,7 @@ logRouter.get(
     searchField: ['levelName', 'message', 'status'],
     sortBy: ['id', 'time', 'createdAt'],
     order:['ASC', 'DESC']
-    }),
+  }),
   logger.getAll
 )
 
@@ -31,7 +31,7 @@ logRouter.get(
 logRouter.patch(
   '/:id', 
   Validator.paramId('id', UuidHandler.uuidRegex),
-  Validator.validateBody({keep:{type:'boolean'}}),
+  Validator.validateBody({ keep:{ type:'boolean' } }),
   logger.update)
 
 logRouter.delete(

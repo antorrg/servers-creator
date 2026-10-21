@@ -8,7 +8,8 @@ import { Sequelize } from 'sequelize'
 import modelsDefinition from '../models/index.model.js'
 
 const sequelize = new Sequelize(envConfig.DatabaseUrl, {
-  logging:false
+  logging:false,
+  native:false
 })
 
 
@@ -17,39 +18,37 @@ const [
 export const database2 =`] = Object.values(modelsDefinition).map(model => model(sequelize))
 
 function getNameDb(dbUri:string):string {
- return dbUri.split('/').slice(-1).join()
+  return dbUri.split('/').slice(-1).join()
 }
 
-async function startUp (syncDb: boolean = false, rewrite: boolean = false) {
+async function startUp(syncDb: boolean = false, rewrite: boolean = false) {
   try {
     await sequelize.authenticate()
-    //eslint-disable-next-line
-    const successMessage =\`🟢​ Database postgreSQL "\${getNameDb(envConfig.DatabaseUrl)}" initialized successfully!!\`
+    const successMessage =\`Database postgreSQL "\${getNameDb(envConfig.DatabaseUrl)}" initialized successfully!!\`
     console.log(successMessage)
     if (envConfig.Status !== 'production' && syncDb) {
       try {
         await sequelize.sync({ force: rewrite })
-    //eslint-disable-next-line
-        let message = \`🧪 Synced database \${getNameDb(envConfig.DatabaseUrl)}: "force \${rewrite}"\`
+        const message = \`Synced database \${getNameDb(envConfig.DatabaseUrl)}: "force \${rewrite}"\`
         logger.info(message)
       } catch (error) {
         logger.error(error)
         //console.error(\`❗Error syncing database \${getNameDb(envConfig.DatabaseUrl)}\`, error)
-         throw error
+        throw error
       }
     }
     logger.info(successMessage)
   } catch (error) {
     //console.error('❌ Error conecting database!', error)
     logger.error(error)
-     throw error
+    throw error
   }
 }
-const closeDatabase = async () => {
+const closeDatabase = async() => {
   await sequelize.close()
   logger.info('🛑 Database disconnect')
 }
 
 
 export {
-    User,`
+  User,`

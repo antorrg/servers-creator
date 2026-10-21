@@ -1,5 +1,5 @@
 
-export const userController = `import { type Request, type Response, type NextFunction } from 'express'
+export const userController = `import { type Request, type Response } from 'express'
 import { responder } from '../../shared/utils/responder.js'
 import type { userService } from '../../shared/dependencies.js'
 

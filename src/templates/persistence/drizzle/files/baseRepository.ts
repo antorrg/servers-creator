@@ -37,7 +37,7 @@ export class BaseRepository<
     const targetField = (whereField ?? this.whereField) as string
     const column = this.getColumn(targetField)
 
-    if (field !== undefined && field !== null && column) {
+    if(field !== undefined && field !== null && column) {
       const records = (await this.database
         .select()
         .from(this.table as PgTable)
@@ -196,18 +196,18 @@ import { BaseRepository } from './BaseRepository.ts'
 import * as help from './testHelpers/testHelp.help.ts'
 
 describe('BaseRepository unit test', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     await startUp()
     await db.delete(user)
   })
-  afterAll(async () => {
+  afterAll(async() => {
     await closeDatabase()
   })
 
   const test = new BaseRepository(user, help.parser, 'User', 'email')
 
   describe('Create method', () => {
-    it('should create a element', async () => {
+    it('should create a element', async() => {
       const response = await test.create(help.dataCreate)
       expect(response).toEqual({
         id: expect.any(String),
@@ -223,18 +223,18 @@ describe('BaseRepository unit test', () => {
   })
   describe('Get methods', () => {
     describe('"getAll" method', () => {
-      it('should retrieve an array of elements', async () => {
+      it('should retrieve an array of elements', async() => {
         await help.createSeedRandomElements(user, help.usersSeed)
         const response = await test.getAll()
         expect(response.length).toBe(16)
       })
-      it('Should retrieve an array of elements filtered by query', async () => {
+      it('Should retrieve an array of elements filtered by query', async() => {
         const response = await test.getAll(false, 'enabled')
         expect(response.length).toBe(3)
       })
     })
     describe('"getById" method', () => {
-      it('Should retrieve an element by Id', async () => {
+      it('Should retrieve an element by Id', async() => {
         const response = await test.getById(help.getStringId())
         expect(response).toEqual({
           id: expect.any(String),
@@ -248,7 +248,7 @@ describe('BaseRepository unit test', () => {
       })
     })
     describe('"getByField" method', () => {
-      it('Should retrieve an element by field', async () => {
+      it('Should retrieve an element by field', async() => {
         const response = await test.getByField('user15@email.com', 'email')
         expect(response).toEqual({
           id: expect.any(String),
@@ -262,14 +262,14 @@ describe('BaseRepository unit test', () => {
       })
     })
     describe('"getWithPages" method', () => {
-      it('Should retrieve an array of paginated elements', async () => {
+      it('Should retrieve an array of paginated elements', async() => {
         const queryObject = { page: 1, limit: 10 } as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 16, page: 1, limit: 10, totalPages: 2 })
         expect(response.data.length).toBe(10)
         expect(response.data.map(a => a.name)).toEqual(['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']) // Order
       })
-      it('Should retrieve filtered and sorted elements', async () => {
+      it('Should retrieve filtered and sorted elements', async() => {
         const queryObject = { page: 1, limit: 10, query: { enabled: false }, order: { name: 'ASC' } } as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 3, page: 1, limit: 10, totalPages: 1 })
@@ -279,7 +279,7 @@ describe('BaseRepository unit test', () => {
     })
   })
   describe('Update method', () => {
-    it('should update an element', async () => {
+    it('should update an element', async() => {
       const data = { name: 'Name of user' }
       const response = await test.update(help.getStringId(), data)
       expect(response).toEqual({
@@ -289,7 +289,7 @@ describe('BaseRepository unit test', () => {
     })
   })
   describe('Delete method', () => {
-    it('should deleted an element', async () => {
+    it('should deleted an element', async() => {
       const response = await test.delete(help.getStringId())
       expect(response).toBe('user@email.com deleted successfully')
     })
@@ -297,7 +297,7 @@ describe('BaseRepository unit test', () => {
 })`
 
 export const baseRepositoryTestHelp = `import { db } from '../../../configs/database.js'
-import { user } from '../../../schemas/user.schema.js'
+import type { user } from '../../../schemas/user.schema.js'
 import { UuidHandler } from '../../utils/UuidHandler.js'
 
 export type UserModel = typeof user.$inferSelect
@@ -357,7 +357,7 @@ export const getStringId = (): string => {
   return stringId
 }
 
-export const createSeedRandomElements = async (table: any, seed: any[]) => {
+export const createSeedRandomElements = async(table: any, seed: any[]) => {
   try {
     if (!seed || seed.length === 0) throw new Error('No data')
     await db.insert(table).values(seed)

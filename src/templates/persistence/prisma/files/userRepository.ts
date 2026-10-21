@@ -71,7 +71,7 @@ export class UserRepository implements IUserRepository {
       return processError(error, \`Error searching user id: \${id}\`)
     }
   }
-    async getPublicById(id: string): Promise<IUser | null> {
+  async getPublicById(id: string): Promise<IUser | null> {
     try {
       const record = await this.base.getById(id)
       return record ? this.mapToPublic(record) : null
