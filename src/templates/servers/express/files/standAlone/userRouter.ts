@@ -3,7 +3,7 @@ import { userCreate, userUpdate, regexEmail } from './schemas.js'
 import { UserController } from './UserController.js'
 import { UserService } from './UserService.js'
 import { users } from './users.js'
-import {Validator} from 'req-valid-express'
+import { Validator } from 'req-valid-express'
 import { UuidHandler } from '../../shared/utils/UuidHandler.js'
 
 const userService = new UserService(users)
@@ -28,12 +28,12 @@ userRouter.put(
   '/:id',
   Validator.paramId('id', UuidHandler.uuidRegex),
   Validator.validateBody(userUpdate),
- Validator.validateRegex(regexEmail,'email','Invalid email format'),
+  Validator.validateRegex(regexEmail,'email','Invalid email format'),
   userController.update
 )
 userRouter.delete(
   '/:id',
-    Validator.paramId('id', UuidHandler.uuidRegex),
+  Validator.paramId('id', UuidHandler.uuidRegex),
   userController.delete
 )
 

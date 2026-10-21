@@ -56,10 +56,10 @@ export class UserService implements IGenericService<IUser,UserCreate, UserUpdate
   }
 
   // Eliminar un usuario por ID
-  delete(id: string): ServiceResponse<IUser> {
+  delete(id: string): ServiceResponse<string> {
     const index = this.Model.findIndex(user => user.id === id)
     if (index === -1) {
-      throwError(ERROR_CODE.NOT_FOUND,'User not found')
+      throwError(ERROR_CODE.NOT_FOUND, 'User not found')
     }
     const deleted = this.Model.splice(index, 1)[0]
     return \`User \${deleted.name} deleted successfully\`
