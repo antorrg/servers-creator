@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-10-21
+
+### Added
+
+- Added deliberate ESLint exception documentation (`001 — Use of any in Prisma BaseRepository Generics`) in `docs/explanation/typescript-eslint-exceptions.md` explaining Prisma model delegate parameter contravariance.
+
+### Changed
+
+- **Sequelize Repository Layer**:
+  - Strongly typed `BaseRepository` with `TModel extends Model = Model` and `parserFn: (model: TModel) => TDTO`.
+  - Replaced `any` assertions in queries with Sequelize native `WhereOptions` and `Order` types.
+  - Used native `model.get()` in `BaseRepository.delete` instead of `any` property access.
+  - Strongly typed `UserRepository` with `UserDb` model, eliminating `model as any` and `record: any`.
+  - Typed `createSeedRandomElements` helper with `CreationAttributes<UserDb>[]`.
+- **Fastify Infrastructure**:
+  - Replaced `(err as any).statusCode` and `(err as any).status` with safe type narrowing via `Record<string, unknown>`.
+  - Replaced `Record<string, any>` in `SessionData` with `Partial<Session> & Record<string, unknown>`.
+  - Typed Fastify session configuration with `FastifySessionOptions` and `SessionStore` from `@fastify/session`.
+  - Resolved `DbSessionStore` constructor options with strongly typed `ResolvedSessionStoreOptions` without `as any`.
+- **Fastify Standalone App**:
+  - Replaced empty `ServiceResponse<T>` interface with type alias `export type ServiceResponse<T> = T`.
+  - Updated `IGenericService.delete` and `UserService.delete` return types to `ServiceResponse<string>` to match the deletion message return value.
+
+### Fixed
+
+- Fixed switch/case indentation and trailing comma in standalone Fastify `logger.ts`.
+- Fixed ESLint function spacing (`space-before-function-paren`) and unused parameter warnings in Fastify controllers and auth pre-handlers.
+- Linked `eslint-disable-line` directives in Prisma `BaseRepository` directly to Exception `001`.
+
 ## [0.0.2] - 2026-10-18
 
 ### Changed
