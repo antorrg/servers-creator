@@ -31,7 +31,7 @@ export class DbSessionStore extends Store {
 
   constructor(options: SessionStoreOptions) {
     super()
-    this.options = { ...defaultOptions, ...(options || {}) } as any
+    this.options = { ...defaultOptions, ...(options || {}) } as Required<SessionStoreOptions>
 
     if (!this.options.adapter) {
       throw new Error('adapter (ISessionAdapter) instance is required for DbSessionStore')
@@ -118,6 +118,5 @@ export class DbSessionStore extends Store {
     return new Date(Date.now() + this.options.expiration)
   }
 }
-
 export default DbSessionStore
-`
+  `

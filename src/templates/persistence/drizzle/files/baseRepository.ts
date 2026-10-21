@@ -296,7 +296,9 @@ describe('BaseRepository unit test', () => {
   })
 })`
 
-export const baseRepositoryTestHelp = `import { db } from '../../../configs/database.js'
+export const baseRepositoryTestHelp = `import type { InferInsertModel } from 'drizzle-orm'
+import type { AnyPgTable } from 'drizzle-orm/pg-core'
+import { db } from '../../../configs/database.js'
 import type { user } from '../../../schemas/user.schema.js'
 import { UuidHandler } from '../../utils/UuidHandler.js'
 
@@ -357,7 +359,10 @@ export const getStringId = (): string => {
   return stringId
 }
 
-export const createSeedRandomElements = async(table: any, seed: any[]) => {
+export const createSeedRandomElements = async <TTable extends AnyPgTable>(
+  table: TTable,
+  seed: InferInsertModel<TTable>[]
+) => {
   try {
     if (!seed || seed.length === 0) throw new Error('No data')
     await db.insert(table).values(seed)

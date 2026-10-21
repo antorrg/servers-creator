@@ -30,18 +30,18 @@ export interface IPrismaDelegate<TRecord = unknown> {
  * Infiere el modelo de datos propio de Prisma (TRecord) a partir del Delegate proporcionado
  */
 export type PrismaModelRecord<TModel> =
-  TModel extends { findFirst(...args: any[]): Promise<infer R | null> }//eslint-disable-line
+  TModel extends { findFirst(...args: any[]): Promise<infer R | null> } // eslint-disable-line @typescript-eslint/no-explicit-any -- Exception 001: see docs/explanation/typescript-eslint-exceptions.md
     ? NonNullable<R>
-    : TModel extends { findMany(...args: any[]): Promise<Array<infer R>> }//eslint-disable-line
+    : TModel extends { findMany(...args: any[]): Promise<Array<infer R>> } // eslint-disable-line @typescript-eslint/no-explicit-any -- Exception 001: see docs/explanation/typescript-eslint-exceptions.md
     ? R
     : Record<string, unknown>
 
 export class BaseRepository<
   TDTO,
-  TCreate extends Record<string, any> = any,//eslint-disable-line
+  TCreate extends Record<string, any> = any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Exception 001: see docs/explanation/typescript-eslint-exceptions.md
   TUpdate = Partial<TCreate>,
-  TModel extends IPrismaDelegate<any> = any,//eslint-disable-line
-  TRecord extends Record<string, any> = PrismaModelRecord<TModel>//eslint-disable-line
+  TModel extends IPrismaDelegate<any> = any, // eslint-disable-line @typescript-eslint/no-explicit-any -- Exception 001: see docs/explanation/typescript-eslint-exceptions.md
+  TRecord extends Record<string, any> = PrismaModelRecord<TModel> // eslint-disable-line @typescript-eslint/no-explicit-any -- Exception 001: see docs/explanation/typescript-eslint-exceptions.md
 > implements IBaseRepository<TDTO, TCreate, TUpdate> {
   constructor(
     private readonly Model: TModel,

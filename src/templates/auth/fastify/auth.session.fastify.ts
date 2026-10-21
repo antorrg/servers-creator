@@ -28,7 +28,7 @@ export const authSessionFastify = (options: ProjectConfig)=>{
           path:`/${options.sourceFolderName}/shared/auth/session/types.ts`,
           file: `import type { Session } from 'fastify'
 
-export type SessionData = Session | Record<string, any>
+export type SessionData = Partial<Session> & Record<string, unknown>
 
 export interface DefaultFields {
   data: string
@@ -50,6 +50,14 @@ export interface SessionStoreOptions {
   checkExpirationInterval?: number
   expiration?: number
   disableTouch?: boolean
+  extendDefaultFields?: (defaults: DefaultFields, session: SessionData) => DefaultFields
+}
+
+export type ResolvedSessionStoreOptions = {
+  adapter: ISessionAdapter
+  checkExpirationInterval: number
+  expiration: number
+  disableTouch: boolean
   extendDefaultFields?: (defaults: DefaultFields, session: SessionData) => DefaultFields
 }
       `

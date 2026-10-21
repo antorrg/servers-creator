@@ -2,7 +2,7 @@
 export const userController = `import type { FastifyRequest, FastifyReply } from 'fastify'
 import { responder } from '../../shared/utils/responder.js'
 import type { userService } from '../../shared/dependencies.js'
-import * as sch from './userSchema.js'
+import type * as sch from './userSchema.js'
 
 type UserServiceType = typeof userService
 type UserParams = { userId: string }

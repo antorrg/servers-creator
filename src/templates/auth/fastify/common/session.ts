@@ -8,24 +8,26 @@
 export const session = `import sessionAdapter from './session/connect-db.js'
 import DbSessionStore from './session/connect-session-app.js'
 import envConfig from '../../configs/envConfig.js'
+import type { FastifySessionOptions, SessionStore } from '@fastify/session'
 
 export const sessionStore = new DbSessionStore({
   adapter: sessionAdapter
 })
 
-export const sessionConfig = {
+export const sessionConfig: FastifySessionOptions = {
   secret: envConfig.SessionSecret,
-  store: sessionStore as any,
+  store: sessionStore as unknown as SessionStore,
   cookieName: 'app.sid',
   saveUninitialized: false,
   rolling: true,
   cookie: {
     httpOnly: true,
     secure: envConfig.Status === 'production',
-    sameSite: 'lax' as const,
+    sameSite: 'lax',
     maxAge: 1000 * 60 * 30
   }
 }`
+
 
 export const sessionTest = `import { describe, it, beforeAll, expect } from 'vitest'
 import { createTestApp } from './testHelpers/serverTest.help.js'
@@ -34,7 +36,7 @@ import type { FastifyInstance } from 'fastify'
 
 describe('Session & CSRF Auth tests', () => {
   let app: FastifyInstance
-  let cookiesDict: Record<string, string> = {}
+  const cookiesDict: Record<string, string> = {}
 
   function updateCookies(resCookies?: Array<{ name: string; value: string }>) {
     if (resCookies) {
@@ -44,7 +46,7 @@ describe('Session & CSRF Auth tests', () => {
     }
   }
 
-  beforeAll(async () => {
+  beforeAll(async() => {
     app = await createTestApp()
     const response = await app.inject({
       method: 'GET',
@@ -53,7 +55,7 @@ describe('Session & CSRF Auth tests', () => {
     updateCookies(response.cookies)
   })
 
-  it('should deny access if not authenticated', async () => {
+  it('should deny access if not authenticated', async() => {
     const res = await app.inject({
       method: 'GET',
       url: '/protected'
@@ -61,7 +63,7 @@ describe('Session & CSRF Auth tests', () => {
     expect(res.statusCode).toBe(401)
   })
 
-  it('should login successfully and set session', async () => {
+  it('should login successfully and set session', async() => {
     const user = { id: '123', email: 'test@test.com', role: UserRole.USER }
     const csrfToken = cookiesDict['XSRF-TOKEN'] ? decodeURIComponent(cookiesDict['XSRF-TOKEN']) : ''
 
@@ -82,7 +84,7 @@ describe('Session & CSRF Auth tests', () => {
     updateCookies(res.cookies)
   })
 
-  it('should allow access to protected route after login', async () => {
+  it('should allow access to protected route after login', async() => {
     const res = await app.inject({
       method: 'GET',
       url: '/protected',
@@ -94,7 +96,7 @@ describe('Session & CSRF Auth tests', () => {
     expect(body.user.email).toBe('test@test.com')
   })
 
-  it('should deny access to admin route for normal user', async () => {
+  it('should deny access to admin route for normal user', async() => {
     const res = await app.inject({
       method: 'GET',
       url: '/admin',
@@ -103,7 +105,7 @@ describe('Session & CSRF Auth tests', () => {
     expect(res.statusCode).toBe(403)
   })
 
-  it('should allow access to admin route after admin login', async () => {
+  it('should allow access to admin route after admin login', async() => {
     const admin = { id: '456', email: 'admin@test.com', role: UserRole.ADMIN }
     const adminCookies: Record<string, string> = {}
 
@@ -139,7 +141,7 @@ describe('Session & CSRF Auth tests', () => {
     expect(body.success).toBe(true)
   })
 
-  it('should logout successfully', async () => {
+  it('should logout successfully', async() => {
     const csrfToken = cookiesDict['XSRF-TOKEN'] ? decodeURIComponent(cookiesDict['XSRF-TOKEN']) : ''
 
     const logoutRes = await app.inject({
@@ -185,26 +187,26 @@ export async function createTestApp() {
   app.addHook('preHandler', setCsrfToken)
   app.addHook('preHandler', verifyCsrfToken)
 
-  app.post('/login', async (req, reply) => {
+  app.post('/login', async(req, reply) => {
     const { user } = req.body as { user: SessionUser }
     await Auth.login(req, user)
     return reply.status(200).send({ success: true, message: 'Logged in' })
   })
 
-  app.post('/logout', async (req, reply) => {
+  app.post('/logout', async(req, reply) => {
     await Auth.logout(req)
     return reply.status(200).send({ success: true, message: 'Logged out' })
   })
 
-  app.get('/csrf', async (req, reply) => {
+  app.get('/csrf', async(req, reply) => {
     return reply.status(200).send({ success: true, message: 'CSRF token set' })
   })
 
-  app.get('/protected', { preHandler: [isAuthenticated] }, async (req, reply) => {
+  app.get('/protected', { preHandler: [isAuthenticated] }, async(req, reply) => {
     return reply.status(200).send({ success: true, message: 'Passed middleware', user: req.session.user })
   })
 
-  app.get('/admin', { preHandler: [authorize(UserRole.ADMIN)] }, async (req, reply) => {
+  app.get('/admin', { preHandler: [authorize(UserRole.ADMIN)] }, async(req, reply) => {
     return reply.status(200).send({ success: true, message: 'Passed middleware' })
   })
 

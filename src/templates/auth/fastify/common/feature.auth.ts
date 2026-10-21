@@ -27,7 +27,7 @@ export class AuthController {
     this.authService = authService
   }
 
-  login = async (request: FastifyRequest, reply: FastifyReply) => {
+  login = async(request: FastifyRequest, reply: FastifyReply) => {
     const { email, password } = request.body as { email?: string; password?: string }
     if (!email || !password) {
       throwError(ERROR_CODE.INVALID_INPUT, 'Email y contraseña requeridos')
@@ -53,7 +53,7 @@ export class AuthController {
     return responder(reply, 200, userSessionData)
   }
 
-  logout = async (request: FastifyRequest, reply: FastifyReply) => {
+  logout = async(request: FastifyRequest, reply: FastifyReply) => {
     await Auth.logout(request)
     reply.clearCookie('app.sid', {
       path: '/',
@@ -65,7 +65,7 @@ export class AuthController {
     return responder(reply, 200, 'Sesión cerrada')
   }
 
-  me = async (request: FastifyRequest, reply: FastifyReply) => {
+  me = async(request: FastifyRequest, reply: FastifyReply) => {
     const user = Auth.getSessionUser(request)
     if (!user) {
       throwError(ERROR_CODE.ACCESS_DENIED, 'No autenticado')

@@ -6,16 +6,16 @@ import { User, type UserProps } from './User.js'
 import { processError, throwError, ERROR_CODE } from '../../configs/errors.js'
 
 export class UserRepository implements IUserRepository {
-  private base: BaseRepository<UserProps, UserProps, Partial<UserProps>>
+  private base: BaseRepository<UserProps, UserProps, Partial<UserProps>, UserDb>
 
   constructor(model: typeof UserDb = UserDb) {
-    this.base = new BaseRepository(model as any, this.mapToRecord, 'User', 'email')
+    this.base = new BaseRepository<UserProps, UserProps, Partial<UserProps>, UserDb>(model, this.mapToRecord, 'User', 'email')
   }
 
   // ==========================================
   // HELPER: Map from db to user props
   // ==========================================
-  private mapToRecord(record: any): UserProps {
+  private mapToRecord(record: UserDb): UserProps {
     return {
       id: record.id,
       email: record.email,

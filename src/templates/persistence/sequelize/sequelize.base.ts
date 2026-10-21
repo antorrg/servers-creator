@@ -25,7 +25,7 @@ export default {
      {
         path:`/${options.sourceFolderName}/configs/database.ts`,
         file: `${dep.database1}
-  Log${authIndex.line}
+${authIndex.function}
 ${dep.database2}
   Log${authIndex.line},
   sequelize,

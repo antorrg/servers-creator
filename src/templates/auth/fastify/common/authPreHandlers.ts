@@ -31,7 +31,7 @@ export const RoleHierarchy: Record<UserRole, number> = {
   [UserRole.OWNER]: 3
 }
 
-export const csrfProtection = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+export const csrfProtection = async(request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
   if (!request.session) return
   if (!request.session.csrfSecret) {
     request.session.csrfSecret = csrfTokens.secretSync()
@@ -41,7 +41,7 @@ export const csrfProtection = async (request: FastifyRequest, reply: FastifyRepl
   }
 }
 
-export const setCsrfToken = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+export const setCsrfToken = async(request: FastifyRequest, reply: FastifyReply): Promise<void> => {
   if (!request.session?.csrfSecret) return
   const secret = request.session.csrfSecret
   const token = csrfTokens.create(secret)
@@ -53,7 +53,7 @@ export const setCsrfToken = async (request: FastifyRequest, reply: FastifyReply)
   })
 }
 
-export const verifyCsrfToken = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+export const verifyCsrfToken = async(request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
   if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) return
   const secret = request.session?.csrfSecret
   if (!secret) {
@@ -71,7 +71,7 @@ export const verifyCsrfToken = async (request: FastifyRequest, reply: FastifyRep
   }
 }
 
-export const isAuthenticated = async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+export const isAuthenticated = async(request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
   const user = request.session?.user
   if (!user) {
     throwError(ERROR_CODE.UNAUTHORIZED, { message: 'Unauthenticated' })
@@ -79,7 +79,7 @@ export const isAuthenticated = async (request: FastifyRequest, reply: FastifyRep
 }
 
 export const authorize = (...allowedRoles: UserRole[]) =>
-  async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  async(request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
     const user = request.session?.user
     if (!user) {
       throwError(ERROR_CODE.UNAUTHORIZED, { message: 'No autenticado' })
@@ -90,7 +90,7 @@ export const authorize = (...allowedRoles: UserRole[]) =>
   }
 
 export const authorizeMinRole = (minimumRole: UserRole) =>
-  async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+  async(request: FastifyRequest, _reply: FastifyReply): Promise<void> => {
     const sessionUser = request.session?.user
     if (!sessionUser) {
       throwError(ERROR_CODE.UNAUTHORIZED, { message: 'No autenticado' })

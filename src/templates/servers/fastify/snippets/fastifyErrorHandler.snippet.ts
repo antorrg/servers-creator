@@ -1,7 +1,6 @@
 export const fastifyErrorHandlerSnippet = {
   imports: `import type { FastifyRequest, FastifyReply } from 'fastify'`,
-  handler: `
-export function errorHandler(
+  handler: `export function errorHandler(
   err: unknown,
   request: FastifyRequest,
   reply: FastifyReply
@@ -18,10 +17,11 @@ export function errorHandler(
 
   let status: number
 
-  if (typeof err === 'object' && err !== null && 'statusCode' in err && typeof (err as any).statusCode === 'number') {
-    status = (err as any).statusCode
-  } else if (typeof err === 'object' && err !== null && 'status' in err && typeof (err as any).status === 'number') {
-    status = (err as any).status
+  const errObj = typeof err === 'object' && err !== null ? (err as Record<string, unknown>) : null
+  if (typeof errObj?.statusCode === 'number') {
+    status = errObj.statusCode
+  } else if (typeof errObj?.status === 'number') {
+    status = errObj.status
   } else {
     status = ErrorStatus[e.code] ?? 500
   }
@@ -61,7 +61,7 @@ export function notFoundHandler(request: FastifyRequest, reply: FastifyReply): v
 }
 export const fastifyErrorHandlerTestSnippet = {
   imports: `import type { FastifyRequest, FastifyReply } from 'fastify'`,
-  handler: `describe('Fastify handlers', () => {
+  handler: `  describe('Fastify handlers', () => {
     let req: Partial<FastifyRequest>
     let reply: Partial<FastifyReply>
     let reqLog: { error: ReturnType<typeof vi.fn> }

@@ -3,7 +3,7 @@
  */
 
 
-export const connectSessionApp = `import type { ISessionAdapter, SessionStoreOptions, DefaultFields, SessionData } from './types.js'
+export const connectSessionApp = `import type { ISessionAdapter, SessionStoreOptions, ResolvedSessionStoreOptions, DefaultFields, SessionData } from './types.js'
 
 const defaultOptions = {
   checkExpirationInterval: 15 * 60 * 1000,
@@ -21,16 +21,15 @@ function promisify<T>(promise: Promise<T>, fn?: (err: unknown, data?: T) => void
 }
 
 export class DbSessionStore {
-  public options: Required<SessionStoreOptions>
+  public options: ResolvedSessionStoreOptions
   public adapter: ISessionAdapter
   private _expirationInterval: NodeJS.Timeout | null = null
 
   constructor(options: SessionStoreOptions) {
-    this.options = { ...defaultOptions, ...(options || {}) } as any
-
-    if (!this.options.adapter) {
+    if (!options?.adapter) {
       throw new Error('adapter (ISessionAdapter) instance is required for DbSessionStore')
     }
+    this.options = { ...defaultOptions, ...options }
     this.adapter = this.options.adapter
 
     this.startExpiringSessions()

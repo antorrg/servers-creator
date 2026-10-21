@@ -3,22 +3,18 @@ import type { ProjectConfig } from "../../../types.js"
 const fileSession = {
   import: `import Session from './session.model.js'`,
   line: `,
-  Session`
-}
-const fileRefresh = {
-    import: `import RefreshToken from './refreshToken.model.js'`,
-    line: `
-    RefreshToken,`
+  Session`,
+  function: 'const Session = modelsDefinition.Session(sequelize)'
 }
 const emptyFile = {
   
     import: '',
-    line: ``
+    line: ``,
+    function: ''
 }
 
   export const seqAuthIndex = (options: ProjectConfig)=>{
   if(options.selectedAuth.endsWith('-session')){return fileSession}
-  if(options.selectedAuth.endsWith('-jwt-db')){return fileRefresh}
   return emptyFile
 
 }

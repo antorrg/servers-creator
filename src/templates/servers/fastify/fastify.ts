@@ -37,10 +37,10 @@ path:`/${options.sourceFolderName}/index.ts`,
 file:`import fastify from './app.js'${options.selectedOrm !== 'none'?`\nimport { startUp } from './configs/database.js'`:''}
 import envConfig from './configs/envConfig.js'
 
-const message =\`Server is listening on port \${envConfig.Port}\\nServer in \${envConfig.Status}\\n 🚀​ Everything is allright!!\`
+const message =\`Server is listening on port \${envConfig.Port}\\nServer in \${envConfig.Status}\\nEverything is allright!!\`
 async function serverBootstrap(){
-  try{${options.selectedOrm !== 'none'?`\n      await startUp()`:''}
-    await fastify.listen({port: envConfig.Port})
+  try{${options.selectedOrm !== 'none'?`\n    await startUp()`:''}
+    await fastify.listen({ port: envConfig.Port })
     console.log(message)
   }catch(error){
     console.error('Error initializing server: ',error)
@@ -56,12 +56,12 @@ file: dep.serverConfig
 },
 {
   path:`/${options.sourceFolderName}/shared/utils/responder.ts`,
-  file: `import type { FastifyReply } from 'fastify';
+  file: `import type { FastifyReply } from 'fastify'
 
-export function responder(
+export function responder<T>(
   reply: FastifyReply,
   status: number,
-  data: any
+  data: T
 ) {
   return reply.status(status).send(data)
 }`

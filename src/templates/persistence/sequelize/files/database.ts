@@ -13,9 +13,9 @@ const sequelize = new Sequelize(envConfig.DatabaseUrl, {
 })
 
 
-const [
-  User,`
-export const database2 =`] = Object.values(modelsDefinition).map(model => model(sequelize))
+const User = modelsDefinition.User(sequelize)
+const Log = modelsDefinition.Log(sequelize)`
+export const database2 =`
 
 function getNameDb(dbUri:string):string {
   return dbUri.split('/').slice(-1).join()

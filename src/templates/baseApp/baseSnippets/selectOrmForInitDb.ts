@@ -12,9 +12,9 @@ export const testOrms = (options:ProjectConfig)=>{
         db.prisma.user.findMany(),
         db.prisma.log.findMany()${options.selectedAuth.endsWith('session')?',\n        db.prisma.session.findMany()': ''}
       ])
-      results.forEach((result) => {
+      results.forEach((result: unknown[]) => {
         expect(Array.isArray(result)).toBe(true)
-        expect(result.length).toBe(0)
+        expect(result).toHaveLength(0)
       })
     })
   })`,
@@ -22,29 +22,29 @@ export const testOrms = (options:ProjectConfig)=>{
   sequelize: `
   describe('Database existence', () => {
     it('should query tables and return an empty array', async() => { 
-      const models = [ 
-        db.Log,
-        db.User,
-        ${options.selectedAuth.endsWith('session')?'db.Session': ''}
-      ]
-      for (const model of models) {
-        const records = await model.findAll()
-        expect(Array.isArray(records)).toBe(true)
-        expect(records.length).toBe(0)
-      }
+      const models = await Promise.all([ 
+        db.Log.findAll(),
+        db.User.findAll(),
+        ${options.selectedAuth.endsWith('session')?'db.Session.findAll()': ''}
+      ])
+      models.forEach((model) => {
+        expect(Array.isArray(model)).toBe(true)
+        expect(model).toHaveLength(0)
+      })
     })
   })
     `,
   dbImportDrizzle:"import * as sch from '../schemas/index.schemas.js'",
   drizzle: `
   describe('Database existence', () => {
-    it('should query tables and return an empty array', async () => {
+    it('should query tables and return an empty array', async() => {
       const results = await Promise.all([
-        db.db.select().from(sch.user),
-        db.db.select().from(sch.log)${options.selectedAuth.endsWith('session')?',\n        db.db.select().from(sch.session)': ''}
+        db.db.select().from(sch.user).limit(0),
+        db.db.select().from(sch.log).limit(0)${options.selectedAuth.endsWith('session')?',\n        db.db.select().from(sch.session).limit(0)': ''}
       ])
-        results.forEach((result) => {
+      results.forEach((result: unknown[]) => {
         expect(Array.isArray(result)).toBe(true)
+        expect(result).toHaveLength(0)
       })
     })
   })
@@ -67,6 +67,12 @@ export const testOrms = (options:ProjectConfig)=>{
         importTest: objectTest.dbImportDrizzle,
         startUp: 'await db.startUp()',
         testCode: objectTest.drizzle
+     }
+    case 'none': 
+      return {
+        importTest: '',
+        startUp: '',
+        testCode: ''
      }
     default: throw new Error(`[Orm-Section]: Orm ${options.selectedOrm} not implemented yet`)
   }

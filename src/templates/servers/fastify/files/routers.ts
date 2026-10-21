@@ -52,7 +52,7 @@ const userIdParamsSchema = {
   additionalProperties: false
 } as const
 
-export default async function userRouter (fastify: FastifyInstance) {
+export default async function userRouter(fastify: FastifyInstance) {
   const controller = new UserController(userService)
 
   fastify.get('/', controller.getAll)

@@ -5,19 +5,20 @@
  */
 
 export const baseRepository = `import type { IBaseRepository, IPaginatedOptions, IPaginatedResults } from '../interfaces/base.interface.js'
-import { Model, ModelStatic } from 'sequelize'
+import type { Model, ModelStatic, WhereOptions, Order, CreationAttributes } from 'sequelize'
 import { throwError, ERROR_CODE } from '../../configs/errors.js'
 
 export class BaseRepository<
   TDTO,
-  TCreate extends Record<string, any>,
+  TCreate extends object = Record<string, unknown>,
   TUpdate = Partial<TCreate>,
+  TModel extends Model = Model
 > implements IBaseRepository<TDTO, TCreate, TUpdate> {
   constructor(
-    private readonly Model: ModelStatic<Model>,
-    private readonly parserFn: (model: any) => TDTO,
+    private readonly Model: ModelStatic<TModel>,
+    private readonly parserFn: (model: TModel) => TDTO,
     private readonly modelName: string = Model.name ?? 'Model',
-    private readonly whereField: keyof TDTO & string = 'id' as keyof TDTO & string,
+    private readonly whereField: keyof TDTO & string = 'id' as keyof TDTO & string
   ) {}
 
   async getAll(
@@ -25,9 +26,9 @@ export class BaseRepository<
     whereField?: keyof TDTO | string
   ): Promise<TDTO[]> {
     const whereClause = whereField != null && field != null
-      ? { [whereField]: field }
-      : {}
-    const models = await this.Model.findAll({ where: whereClause as any })
+      ? ({ [whereField]: field } as WhereOptions)
+      : ({} as WhereOptions)
+    const models = await this.Model.findAll({ where: whereClause })
     return models.map(this.parserFn)
   }
 
@@ -37,17 +38,17 @@ export class BaseRepository<
     const page = options?.page ?? 1
     const limit = options?.limit ?? 10
     const offset = (page - 1) * limit
-    const whereClause = options?.query ?? {}
+    const whereClause = (options?.query ?? {}) as WhereOptions
     const orderClause = options?.order
-      ? Object.entries(options.order).map(([field, direction]) => [field, direction])
+      ? (Object.entries(options.order).map(([field, direction]) => [field, direction]) as Order)
       : undefined
 
     const { rows: data, count: total } = await this.Model.findAndCountAll({
       limit,
       offset,
-      where: whereClause as any,
+      where: whereClause,
       distinct: true,
-      order: orderClause as any
+      order: orderClause
     })
 
     return {
@@ -73,13 +74,13 @@ export class BaseRepository<
   ): Promise<TDTO | null> {
     if (field == null) throwError(ERROR_CODE.REQUIRED_FIELD_MISSING, \`No value provided for \${(whereField as string)}\`)
     const model = await this.Model.findOne({
-      where: { [whereField]: field } as any
+      where: { [whereField]: field } as WhereOptions
     })
     return model ? this.parserFn(model) : null
   }
 
   async create(data: TCreate): Promise<TDTO> {
-    const model = await this.Model.create(data as any)
+    const model = await this.Model.create(data as unknown as CreationAttributes<TModel>)
     return this.parserFn(model)
   }
 
@@ -89,35 +90,36 @@ export class BaseRepository<
   ): Promise<TDTO> {
     const model = await this.Model.findByPk(id)
     if (!model) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
-    const updated = await model.update(data as any)
+    const updated = await model.update(data as unknown as Parameters<TModel['update']>[0])
     return this.parserFn(updated)
   }
 
   async delete(id: string | number): Promise<string> {
     const model = await this.Model.findByPk(id)
     if (!model) throwError(ERROR_CODE.NOT_FOUND, \`\${this.modelName} not found\`)
-    const value = (model as any)[this.whereField] ?? id
+    const value = model.get(this.whereField) ?? id
     await model.destroy()
-    return \`\${value} deleted successfully\`
+    return \`\${String(value)} deleted successfully\`
   }
 }`
 export const baseRepositoryTest = `import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 import { startUp, closeDatabase, User as UserModel } from '../../configs/database.js'
+import type { User as UserDb } from '../../models/user.model.js'
 import { BaseRepository } from './BaseRepository.js'
 import * as help from './testHelpers/testHelp.help.js'
 
 describe('BaseRepository unit test', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     await startUp(true, true)
   })
-  afterAll(async () => {
+  afterAll(async() => {
     await closeDatabase()
   })
 
-  const test = new BaseRepository<help.IUserTest, help.CreateUserInput>(UserModel as any, help.parser, 'User', 'email')
+  const test = new BaseRepository<help.IUserTest, help.CreateUserInput, help.UpdateUserInput, UserDb>(UserModel, help.parser, 'User', 'email')
 
   describe('Create method', () => {
-    it('should create an element', async () => {
+    it('should create an element', async() => {
       const response = await test.create(help.dataCreate)
       expect(response).toEqual({
         id: expect.any(String),
@@ -134,19 +136,19 @@ describe('BaseRepository unit test', () => {
 
   describe('Get methods', () => {
     describe('"getAll" method', () => {
-      it('should retrieve an array of elements', async () => {
-        await help.createSeedRandomElements(UserModel as any, help.usersSeed)
+      it('should retrieve an array of elements', async() => {
+        await help.createSeedRandomElements(UserModel, help.usersSeed)
         const response = await test.getAll()
         expect(response.length).toBe(16)
       })
-      it('Should retrieve an array of elements filtered by query', async () => {
+      it('Should retrieve an array of elements filtered by query', async() => {
         const response = await test.getAll(false, 'enabled')
         expect(response.length).toBe(3)
       })
     })
 
     describe('"getById" method', () => {
-      it('Should retrieve an element by Id', async () => {
+      it('Should retrieve an element by Id', async() => {
         const response = await test.getById(help.getStringId())
         expect(response).toEqual({
           id: expect.any(String),
@@ -161,7 +163,7 @@ describe('BaseRepository unit test', () => {
     })
 
     describe('"findByField" method', () => {
-      it('Should retrieve an element by field', async () => {
+      it('Should retrieve an element by field', async() => {
         const response = await test.findByField('user15@email.com', 'email')
         expect(response).toEqual({
           id: expect.any(String),
@@ -176,13 +178,13 @@ describe('BaseRepository unit test', () => {
     })
 
     describe('"getWithPages" method', () => {
-      it('Should retrieve an array of paginated elements', async () => {
+      it('Should retrieve an array of paginated elements', async() => {
         const queryObject = { page: 1, limit: 10 } as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 16, page: 1, limit: 10, totalPages: 2 })
         expect(response.data.length).toBe(10)
       })
-      it('Should retrieve filtered elements', async () => {
+      it('Should retrieve filtered elements', async() => {
         const queryObject = { page: 1, limit: 10, query: { enabled: false } } as const
         const response = await test.getWithPages(queryObject)
         expect(response.info).toEqual({ total: 3, page: 1, limit: 10, totalPages: 1 })
@@ -192,7 +194,7 @@ describe('BaseRepository unit test', () => {
   })
 
   describe('Update method', () => {
-    it('should update an element', async () => {
+    it('should update an element', async() => {
       const data = { name: 'Name of user' }
       const response = await test.update(help.getStringId(), data)
       expect(response).toEqual({
@@ -203,14 +205,15 @@ describe('BaseRepository unit test', () => {
   })
 
   describe('Delete method', () => {
-    it('should delete an element', async () => {
+    it('should delete an element', async() => {
       const response = await test.delete(help.getStringId())
       expect(response).toBe('user@email.com deleted successfully')
     })
   })
 })`
 
-export const baseRepositoryTestHelp = `import { User as UserDb } from '../../../models/user.model.js'
+export const baseRepositoryTestHelp = `import type { User as UserDb } from '../../../models/user.model.js'
+import type { CreationAttributes } from 'sequelize'
 import { UuidHandler } from '../../utils/UuidHandler.js'
 
 export interface IUserTest {
@@ -233,7 +236,7 @@ export interface CreateUserInput {
 }
 export type UpdateUserInput = Partial<CreateUserInput>
 
-export const parser = (raw: any): IUserTest => {
+export const parser = (raw: UserDb): IUserTest => {
   return {
     id: raw.id,
     email: raw.email,
@@ -271,10 +274,13 @@ export const getStringId = (): string => {
 //* --------------------------------------------------
 // ?          UserSeed
 //* --------------------------------------------------
-export const createSeedRandomElements = async (model: typeof UserDb, seed: unknown[]) => {
+export const createSeedRandomElements = async(
+  model: typeof UserDb,
+  seed: readonly CreationAttributes<UserDb>[]
+) => {
   try {
     if (!seed || seed.length === 0) throw new Error('No data')
-    await model.bulkCreate(seed as any[])
+    await model.bulkCreate(seed)
   } catch (error) {
     console.error('Error createSeedRandomElements: ', error)
   }
