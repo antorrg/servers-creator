@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] 2026-11-21
+
 ### Added
 
 - Added automatic invalidation of active user sessions after password changes, role or account-status updates, and user deletion.
