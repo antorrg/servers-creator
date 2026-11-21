@@ -46,6 +46,16 @@ class ConnectDb implements ISessionAdapter {
       where: { sid }
     })
   }
+  async destroyByUserId(userId: string): Promise<number> {
+    const result = await prisma.session.deleteMany({
+      where: {
+        data: {
+          contains: \`"id":"\${userId}"\`
+        }
+      }
+    })
+    return result.count
+  }
 
   async length(): Promise<number> {
     return prisma.session.count({

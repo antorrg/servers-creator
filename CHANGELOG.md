@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added automatic invalidation of active user sessions after password changes, role or account-status updates, and user deletion.
+- Added a session-invalidation callback to `UserService`, keeping session-store infrastructure outside the service/application domain layer.
+- Added `destroyByUserId()` support to session adapters for Sequelize, Prisma, and Drizzle generated projects.
+- Added dependency-injection wiring so `UserService` delegates session cleanup to the configured session adapter.
+
+### Changed
+
+- Updated session adapters to identify and remove persisted sessions by searching serialized session data for the associated user ID.
+- Updated generated session-store implementations and dependency wiring to use the optional `destroyByUserId` session-adapter contract consistently.
+
 ## [0.0.3] - 2026-10-21
 
 ### Added

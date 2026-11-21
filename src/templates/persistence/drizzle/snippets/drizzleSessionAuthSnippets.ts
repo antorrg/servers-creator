@@ -1,7 +1,7 @@
 
 
 export const drizzleessionAuthSnippetExpress = {
-    file: `import { eq, and, gt, lt, count } from 'drizzle-orm'
+    file: `import { eq, and, gt, lt, like, count } from 'drizzle-orm'
 import { db } from '../../../configs/database.js'
 import { session } from '../../../schemas/index.schemas.js'
 import type { ISessionAdapter, DefaultFields } from './types.js'
@@ -52,6 +52,11 @@ class ConnectDb implements ISessionAdapter {
     await db
       .delete(session)
       .where(eq(session.sid, sid))
+  }
+  async destroyByUserId(userId: string) {
+    await db
+      .delete(session)
+      .where(like(session.data, \`%"id":"\${userId}"%\`))
   }
 
   async length(): Promise<number> {

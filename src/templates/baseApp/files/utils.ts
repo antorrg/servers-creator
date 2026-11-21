@@ -1,16 +1,5 @@
-// dependencies, uuidHandler, hasher
+// uuidHandler, hasher
 
-export const dependencies = `import type { IExternalImageDeleteService } from './interfaces/base.interface.js'
-import { UserRepository } from '../features/user/UserRepository.js'
-import { UserService } from '../features/user/UserService.js'
-
-
-export const mockImageDeleteService: IExternalImageDeleteService<string> = {
-  deleteImage: async(_imageInfo: string) => await Promise.resolve('true')
-}
-
-export const userRepository = new UserRepository()
-export const userService = new UserService(userRepository, mockImageDeleteService.deleteImage)`
 
 export const uuidHandler =`import { v7 as uuid } from 'uuid'
 
