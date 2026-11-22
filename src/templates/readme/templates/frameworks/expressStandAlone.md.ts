@@ -77,16 +77,16 @@ pnpm install
 
 ### Environment Setup
 
-\`\`\`bash
-cp .env.example .env.development
-\`\`\`
+The project comes with pre-generated environment files selected automatically via \`NODE_ENV\`:
+- \`.env.development\` (used by \`pnpm dev\` / \`npm run dev\`)
+- \`.env.test\` (used by \`pnpm test\` / \`npm run test\`)
+- \`.env.production\` (used by \`pnpm start\` / \`npm run start\`)
+- \`.env.example\` (reference template)
 
-| Variable | Description | Example | Required |
+| Variable | Description | Default / Example | Required |
 | :--- | :--- | :--- | :--- |
-| \`PORT\` | Server listening port | \`3000\` | Yes |
-| \`USER_IMG\` | Example variable (demo) | \`vgametest\` | Yes |
-
-\`NODE_ENV\` selects the env file: \`development\` → \`.env.development\`, \`test\` → \`.env.test\`, \`production\` → \`.env.production\`.
+| \`PORT\` | Server listening port | \`4000\` (dev) / \`8080\` (test) / \`3000\` (prod) | Yes |
+| \`USER_IMG\` | Example variable (demo) | \`image.png\` | Yes |
 
 ### Run
 

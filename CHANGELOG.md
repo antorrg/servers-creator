@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] 2026-11-22
+
+### Added
+
+- Added `dbGuard` validation in `envConfig.ts` for database-backed templates to ensure test suites (`NODE_ENV=test`) only run against a `*_test` database.
+- Added automatic cryptographic `SESSION_SECRET` generation (`crypto.randomBytes`) for `.env.development`, `.env.test`, and `.env.production` when session authentication is enabled.
+- Added documentation in generated README templates explaining `.env.test` configuration and the `*_test` database safety guard.
+
+### Changed
+
+- Removed hardcoded database name assertion (`vgametest`) from generated `EnvDb.test.ts` in favor of `dbGuard`.
+- Defaulted `.env.test` `DATABASE_URL` to a `dbname_test` suffix with an inline warning comment.
+
 ## [0.0.4] 2026-11-21
 
 ### Added

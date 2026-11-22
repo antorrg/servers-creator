@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import type { ProjectConfig } from "../../types.js"
 import { generalBaseAuth } from "../auth/general-base.auth.js"
 import { ormDependencies } from "../baseApp/baseSnippets/ormDependencies.js"
@@ -6,7 +7,7 @@ import { frameworkInjector } from "./frameworkInjector.js"
 import { authEnvironment } from "./express/files/index.js"
 import * as dep from './baseServerFiles/index.js'
 
-
+const secretGenerator = () => crypto.randomBytes(32).toString('hex')
 
 export const baseServer = (options:ProjectConfig)=>{
   const {importTest, deps, databases, initDb, tests } = ormDependencies(options)
@@ -158,7 +159,7 @@ ${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
     file:`PORT=4000
 USER_IMG=image.png
 ${databases.environmentLine}
-${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
+${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine + secretGenerator(): ''}
 `,
 },
 {
@@ -166,15 +167,16 @@ ${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
     file:`PORT=3000
 USER_IMG=image.png
 ${databases.environmentLine}
-${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
+${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine + secretGenerator(): ''}
 `,
 },
 {
     path:`/.env.test`,
     file:`PORT=8080
 USER_IMG=image.png
-${databases.environmentLine}
-${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine: ''}
+${options.selectedOrm !== 'none'? '# Warning! Tests can only be run against a "*_test" database. example: xxx_test': ''}
+${databases.environmentTestLine}
+${(options.selectedAuth !== 'auth-null')?authEnvironment.envLine + secretGenerator(): ''}
 `,
 },
 {
@@ -201,7 +203,7 @@ const ENV_FILE = {
 type Environment = keyof typeof ENV_FILE
 const NODE_ENV = (process.env.NODE_ENV as Environment) ?? 'production'
 
-dotenv.config({ path: ENV_FILE[NODE_ENV] })
+dotenv.config({ path: ENV_FILE[NODE_ENV], quiet: true })
 
 const getNumberEnv = (value:string):number => {
   const key = process.env[value]
@@ -222,6 +224,15 @@ const envConfig = {
   UserImg: getStringEnv('USER_IMG')${(options.selectedAuth !== 'auth-null')?authEnvironment.envConfigLine: ''}
 }
 export default envConfig
+
+${options.selectedOrm !== 'none'?
+`function dbGuard(url:string){
+  const name = url.split('?')[0].split('/').slice(-1).join()
+  if(process.env.NODE_ENV==='test' && !name.endsWith('_test')){
+    throw new Error('Tests can only be run against a "*_test" database')
+  }
+  return url
+}`: ''}
   `
 },
 //...server
@@ -244,23 +255,16 @@ describe('EnvDb test', () => {
     await db.closeDatabase()
   })
   describe('Environment variables', () => {
-    it('should return the correct environment status and database variable', () => { 
-      const formatEnvInfo = \`App running in: \${envConfig.Status}\`+
-      \`Testing database: \${nameOfDb(envConfig.DatabaseUrl)}\`
+    it('should return the correct environment status', () => { 
+      const formatEnvInfo = \`App running in: \${envConfig.Status}\`
       expect(formatEnvInfo).toBe(
-        'App running in: test'+
-        'Testing database: vgametest'
+        'App running in: test'
       )
     })
   })
 ${tests}
 })
 
-function nameOfDb(url:string): string {
-  if (!url) return 'unknown'
-  const parts = url.split('/')
-  return parts[parts.length - 1] || 'unknown'
-}
  `
 }
 const envTest = {

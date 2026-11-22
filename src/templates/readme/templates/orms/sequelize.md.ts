@@ -24,6 +24,8 @@ Table declarations do not use decorators; instead, for the sake of compatibility
 The project uses the stable Sequelize 6 version. However, with the current configuration, you can switch to version 7—which, as of today, is still in alpha (e.g., 7.0.0-alpha.48).
 If you wish to use \`sequelize-cli\`, you must use \`sequelize\` v6.
 
+Ensure you create both your development database (configured in \`.env.development\`) and your test database ending in \`_test\` (configured in \`.env.test\`) in PostgreSQL before running the app or the test suite.
+
 You can initialize the database by passing \`true\` as a parameter to \`startUp\`, which enables the \`sync\` method with \`force: false\`; passing a second \`true\` enables \`force: true\`. Keep in mind that this method overwrites all tables, resulting in data loss. 
 
 Alternatively, you can initialize the database by installing \`sequelize-cli\` and creating or running a migration.

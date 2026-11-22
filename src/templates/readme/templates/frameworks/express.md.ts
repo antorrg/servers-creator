@@ -39,25 +39,40 @@ PostgreSQL Database: Running locally or via Docker
 npm install
 
 ### 3. Environment Setup
-Create your local environment configuration file from the template:
-\`\`\`bash
-cp .env.example .env.development
-\`\`\`
+
+The project comes with pre-generated environment files selected automatically via \`NODE_ENV\`:
+- \`.env.development\` (used by \`npm run dev\`)
+- \`.env.test\` (used by \`npm run test\`)
+- \`.env.production\` (used by \`npm run start\`)
+- \`.env.example\` (reference template)
+
+${options.selectedAuth !== 'auth-null' ? '> **Note:** Cryptographically secure `SESSION_SECRET` values are already pre-generated in `.env.development`, `.env.test`, and `.env.production`.\n' : ''}
 #### Environment Variables Reference
 | Variable | Description | Default / Example | Required |
 | :--- | :--- | :--- | :--- |
-| \`PORT\` | Server listening port | \`3000\` | No |
-| \`DATABASE_URL\` | PostgreSQL connection string | \`postgres://user:pass@localhost:5432/db\` | Yes |
-| \`SESSION_SECRET\` | Secret key used for session cookie encryption | \`super_secret_key\` | Yes |
+| \`PORT\` | Server listening port | \`4000\` (dev) / \`8080\` (test) / \`3000\` (prod) | Yes |
+| \`USER_IMG\` | Default user image filename/path | \`image.png\` | Yes |
+| \`DATABASE_URL\` | PostgreSQL connection string | \`postgres://user:pass@localhost:5432/dbname\` | Yes |${options.selectedAuth !== 'auth-null' ? '\n| `SESSION_SECRET` | Secret key used for session cookie signing (auto-generated) | `<64-char-hex>` | Yes |' : ''}
 
-#### Configure your database connection parameters inside .env.development:
+#### Configure your database connection inside \`.env.development\`:
 
 \`\`\`bash
+PORT=4000
+USER_IMG=image.png
+DATABASE_URL=postgres://userName:password@localhost:5432/dbname
+\`\`\`
 
-PORT=3000
-DATABASE_URL=postgres://user:password@localhost:5432/dbName
-SESSION_SECRET=super_secret_session_key
+#### Test Environment & Database Safety Guard (\`.env.test\`)
 
+> **Important:** To prevent accidental data loss in your development or production database, \`src/configs/envConfig.ts\` enforces a safety guard (\`dbGuard\`) when \`NODE_ENV=test\`.
+> The database name in \`.env.test\` **must end with \`_test\`** (e.g., \`dbname_test\`), otherwise the test runner will throw an error and abort:
+> \`Error: Tests can only be run against a "*_test" database\`
+
+\`\`\`bash
+PORT=8080
+USER_IMG=image.png
+# Warning! Tests can only be run against a "*_test" database. example: xxx_test
+DATABASE_URL=postgres://userName:password@localhost:5432/dbname_test
 \`\`\`
 
 4. **Database Setup**
@@ -91,7 +106,7 @@ Common helper functions and TypeScript types shared across features.
 
 #### Environment Management (envConfig.ts)
 
-Strongly-typed environment configuration supporting .env.development, .env.test, and .env.production.${orm.part4}
+Strongly-typed environment configuration supporting \`.env.development\`, \`.env.test\`, and \`.env.production\`, including a built-in \`dbGuard\` check that ensures test suites only run against a \`*_test\` database.${orm.part4}
 
 
 #### Logger (logger.ts)
