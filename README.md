@@ -138,6 +138,15 @@ To contribute to `servers-creator` or test changes locally:
 
 ---
 
+### Security by Default
+
+- **Unique secrets per environment**: every generated project gets its own
+  cryptographically secure secret for `development`, `test` and `production`,
+  created at scaffold time with Node's `crypto.randomBytes(32)` (256 bits).
+  No hardcoded or shared default values.
+- **Safe `.gitignore`**: all `.env*` files are ignored except `.env.example`,
+  which only contains placeholders.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).  

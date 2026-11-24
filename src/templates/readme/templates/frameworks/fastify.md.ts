@@ -163,6 +163,24 @@ ${options.projectName}/
 
 \`\`\`
 
+## Environment & Secrets
+
+The secrets in \`.env.development\`, \`.env.test\` and \`.env.production\` were
+generated locally when the project was created. They are meant for local
+development and testing.
+
+For a real deployment, do not copy \`.env.production\` as-is. Inject the secrets
+through your hosting provider's environment settings (Render, Railway, etc.),
+or generate fresh ones:
+
+\`\`\`javascript
+
+    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+\`\`\`
+
+Never commit \`.env\` files: only \`.env.example\` is tracked.
+
 
 ## Main API Endpoints
 
