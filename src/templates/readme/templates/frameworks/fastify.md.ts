@@ -179,5 +179,12 @@ All endpoints are prefixed with \`/api/v1\`.${auth.part4}
 
 | Method | Endpoint | Description | Authentication | Required Payload / Query |
 | :--- | :--- | :--- | :--- | :--- |
-| \`GET\` | \`/\` | Fetch audit & system logs | Admin (not implemented yet)| \`?level=error&limit=50\` |`
+| \`GET\` | \`/\` | Fetch audit & system logs | Admin (not implemented yet)| \`?level=error&limit=50\` |
+
+
+${options.selectedAuth !== 'auth-null'?
+`### **Testing Auth & CSRF (Postman / Insomnia / Thunder Client):**
+
+> Because this server uses cookie-based sessions and CSRF protection, see the step-by-step [Authentication, Sessions & CSRF Protection Guide](./${options.sourceFolderName}/shared/auth/authGuide.md) to learn how to test protected endpoints.`
+: ''}`
 }

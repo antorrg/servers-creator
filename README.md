@@ -1,6 +1,6 @@
 # servers-creator
 
-An interactive, zero-dependency native Node.js CLI tool to scaffold production-ready TypeScript backend projects, web servers, and database setups in seconds.
+An interactive, zero-dependency native Node.js CLI tool to scaffold production-oriented TypeScript backend projects, web servers, and database setups in seconds.
 
 [![npm version](https://img.shields.io/npm/v/servers-creator/latest.svg)](https://www.npmjs.com/package/servers-creator)
 [![npm downloads](https://img.shields.io/npm/dm/servers-creator.svg)](https://www.npmjs.com/package/servers-creator)
@@ -21,7 +21,7 @@ An interactive, zero-dependency native Node.js CLI tool to scaffold production-r
   - ✅ **Standalone / No DB**
   - 🔄 **Mongoose** *(Roadmap)*
 - **Authentication Scaffolding**: Session & Cookie authentication ready to use.
-- **Feature-First Architecture**: Clean, domain-driven directory structure separating features, configurations, and shared layers.
+- **Feature-First Architecture**: Clean, feature-oriented directory structure separating features, configurations, and shared layers.
 - **Production Readiness**: Pre-configured Pino logger, HTTP morgan logging, central error handling, and typed environment configuration.
 
 ---

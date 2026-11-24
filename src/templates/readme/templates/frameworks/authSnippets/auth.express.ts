@@ -1,4 +1,4 @@
-import { Auth } from '../main.session.js'
+import type { Auth } from '../main.session.js'
 
 
 export const authExpress:Auth = {

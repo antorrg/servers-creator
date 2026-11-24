@@ -1,5 +1,6 @@
 import type { ProjectConfig } from "../../types.js"
 import { sessionFrameworkSnippet } from "./session.framework.snippet.js"
+import { authGuide } from './readme/auth-guide.js'
 
 
 export const generalBaseAuth = (options: ProjectConfig)=>{
@@ -86,7 +87,11 @@ export class CSRF {
     return salt + '-' + hash(salt + '-' + secret)
   }
 }`
-}, 
+},
+{
+    path:`/${options.sourceFolderName}/shared/auth/authGuide.md`,
+    file: authGuide
+},
 ...sessionServer
         
     ]

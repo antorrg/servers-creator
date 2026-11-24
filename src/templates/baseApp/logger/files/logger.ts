@@ -8,15 +8,17 @@ let logger: PinoLogger
 
 switch (envConfig.Status) {
 case 'test':
-  // Pretty print en consola, simple
+  // Pretty print en carpeta aparte
   logger = pino({
     level: 'info',
     transport: {
       target: 'pino-pretty',
       options: {
         colorize: true,
+        destination: \`logs/test/\${new Date().toISOString()}.info.log\`,
         translateTime: 'SYS:standard',
-        ignore: 'pid,hostname'
+        ignore: 'pid,hostname',
+        mkdir:true
       }
     }
   })
